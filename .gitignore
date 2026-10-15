@@ -1,0 +1,52 @@
+# Build output
+dist/
+artifacts/
+coverage/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Dependencies
+node_modules/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local scratch
+*.tmp.json
+probe.mjs
+e2e-output.txt
+
+# ---------------------------------------------------------------------------
+# NEVER COMMIT SECRETS
+# ---------------------------------------------------------------------------
+# The project brief in the working directory contained a GitHub personal access
+# token in plaintext. It is a local working note, not source, and must never
+# reach a repository: the history would keep it forever and a public repository
+# is indexed within minutes.
+VOLTRIS SHIELD.txt
+*.secret.*
+secrets.json
+.env
+.env.*
+!.env.example
+
+# Defence in depth: catch a credential before it is staged, even if it is
+# written somewhere unexpected.
+# Enable locally with:  git config core.hooksPath .githooks
+# and install with:     node scripts/install-hooks.mjs
+
+# NOTE: src/generated/psl.json is intentionally NOT ignored.
+# It is a build input that is regenerated deterministically from
+# vendor/public_suffix_list.dat, and is committed so a review can audit exactly
+# which Public Suffix List revision shipped.

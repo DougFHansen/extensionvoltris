@@ -1,0 +1,110 @@
+/**
+ * Design tokens for the VOLTRIS Browser Shield interface.
+ *
+ * Single source of truth for colour, spacing, radius, elevation and motion.
+ * Both light and dark themes are defined here; no component hard-codes a colour.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Brand */
+  --vbs-brand-500: #0f9b8e;
+  --vbs-brand-400: #14b8a6;
+  --vbs-brand-600: #0b7a70;
+  --vbs-brand-glow: rgba(20, 184, 166, 0.24);
+
+  /* Neutrals (light) */
+  --vbs-bg: #f6f7f9;
+  --vbs-surface: #ffffff;
+  --vbs-surface-2: #f0f2f5;
+  --vbs-surface-3: #e5e8ec;
+  --vbs-border: #dfe3e8;
+  --vbs-border-strong: #c7ccd4;
+  --vbs-text: #10151c;
+  --vbs-text-muted: #5b6472;
+  --vbs-text-faint: #8b95a3;
+
+  /* Semantic status */
+  --vbs-ok: #12855c;
+  --vbs-ok-bg: rgba(18, 133, 92, 0.1);
+  --vbs-warn: #a5660a;
+  --vbs-warn-bg: rgba(165, 102, 10, 0.1);
+  --vbs-danger: #c0342b;
+  --vbs-danger-bg: rgba(192, 52, 43, 0.1);
+  --vbs-info: #1f6fd0;
+  --vbs-info-bg: rgba(31, 111, 208, 0.1);
+  --vbs-neutral-bg: rgba(91, 100, 114, 0.08);
+
+  /* Typography */
+  --vbs-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, Cantarell, sans-serif;
+  --vbs-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --vbs-fs-xs: 11px;
+  --vbs-fs-sm: 12px;
+  --vbs-fs-base: 13px;
+  --vbs-fs-md: 15px;
+  --vbs-fs-lg: 19px;
+  --vbs-fs-xl: 26px;
+  --vbs-fs-2xl: 34px;
+
+  /* Spacing */
+  --vbs-sp-1: 4px;
+  --vbs-sp-2: 8px;
+  --vbs-sp-3: 12px;
+  --vbs-sp-4: 16px;
+  --vbs-sp-5: 20px;
+  --vbs-sp-6: 28px;
+  --vbs-sp-7: 40px;
+
+  /* Radius */
+  --vbs-r-sm: 6px;
+  --vbs-r-md: 10px;
+  --vbs-r-lg: 14px;
+  --vbs-r-full: 999px;
+
+  /* Elevation */
+  --vbs-shadow-1: 0 1px 2px rgba(16, 21, 28, 0.06), 0 1px 1px rgba(16, 21, 28, 0.04);
+  --vbs-shadow-2: 0 4px 14px rgba(16, 21, 28, 0.08), 0 1px 3px rgba(16, 21, 28, 0.05);
+  --vbs-shadow-3: 0 18px 48px rgba(16, 21, 28, 0.18);
+
+  --vbs-transition: 140ms cubic-bezier(0.2, 0, 0.2, 1);
+  --vbs-focus-ring: 0 0 0 2px var(--vbs-surface), 0 0 0 4px var(--vbs-brand-400);
+}
+
+[data-theme='dark'] {
+  --vbs-bg: #0b0f14;
+  --vbs-surface: #131920;
+  --vbs-surface-2: #1a212b;
+  --vbs-surface-3: #232c38;
+  --vbs-border: #26303d;
+  --vbs-border-strong: #38455a;
+  --vbs-text: #eef2f7;
+  --vbs-text-muted: #9aa6b6;
+  --vbs-text-faint: #6c7a8d;
+
+  --vbs-ok: #3ecf8e;
+  --vbs-ok-bg: rgba(62, 207, 142, 0.12);
+  --vbs-warn: #e5a94a;
+  --vbs-warn-bg: rgba(229, 169, 74, 0.12);
+  --vbs-danger: #f2766c;
+  --vbs-danger-bg: rgba(242, 118, 108, 0.12);
+  --vbs-info: #6aa9f5;
+  --vbs-info-bg: rgba(106, 169, 245, 0.12);
+  --vbs-neutral-bg: rgba(154, 166, 182, 0.1);
+
+  --vbs-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --vbs-shadow-2: 0 6px 18px rgba(0, 0, 0, 0.45);
+  --vbs-shadow-3: 0 24px 60px rgba(0, 0, 0, 0.6);
+
+  --vbs-brand-glow: rgba(20, 184, 166, 0.2);
+}
+
+[data-reduced-motion='true'] {
+  --vbs-transition: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --vbs-transition: 0ms;
+  }
+}

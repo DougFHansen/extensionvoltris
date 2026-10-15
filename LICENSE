@@ -1,0 +1,27 @@
+# VOLTRIS — Proprietary Licence
+
+Copyright (c) 2026 VOLTRIS. All rights reserved.
+
+## Extension source code
+
+The VOLTRIS Browser Shield source code, build scripts, tests, icons, interface design
+and documentation ("the Software") are proprietary to VOLTRIS. No rights are granted
+to copy, modify, distribute or create derivative works of the Software without prior
+written permission.
+
+## Third-party components
+
+The Software incorporates third-party components under their own licences. Those
+components remain governed by their respective licences, which are listed in
+`THIRD_PARTY_NOTICES.md` and `store/FEEDS_AND_LICENSES.md`. In particular:
+
+- The **derived rule dataset** compiled from the EasyList authors' filter lists is
+  licensed under **Creative Commons Attribution-ShareAlike 3.0 Unported**, at the
+  election of the EasyList authors' dual licensing. That licence applies to the derived
+  data only, not to the Software's source code.
+- The **Public Suffix List** is used under the Mozilla Public License 2.0.
+- Threat data from **Phishing.Database** (MIT) and the **StevenBlack hosts** project
+  (MIT) is redistributed as public threat data.
+
+Where a required attribution notice applies, it is reproduced in
+`THIRD_PARTY_NOTICES.md` and surfaced in the extension's Settings → Updates tab.

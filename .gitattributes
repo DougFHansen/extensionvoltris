@@ -1,0 +1,30 @@
+# Normalise line endings in the repository.
+#
+# Why this matters for this project specifically: the published package's SHA-256
+# is recorded in artifacts/SHA256SUMS.txt, and line endings change file bytes.
+# Without this, the same commit checked out on Windows and on Linux produces
+# different archives, so the checksum a reviewer downloads cannot be compared to
+# the one the build printed.
+#
+# `* text=auto eol=lf` stores LF in the repository and checks out LF everywhere.
+# Windows editors still show and save CRLF correctly; git normalises on commit.
+
+* text=auto eol=lf
+
+# Generated and vendored data must never be rewritten: byte-for-byte
+# reproducibility of the Public Suffix List is what makes its hash meaningful.
+vendor/public_suffix_list.dat -text
+src/generated/psl.json -text
+
+# Binary assets.
+*.png binary
+*.jpg binary
+*.ico binary
+*.zip binary
+
+# Lockfiles are diffed line by line and must stay text.
+package-lock.json text eol=lf
+
+# Shell scripts must stay LF or they break on Unix.
+*.sh text eol=lf
+.githooks/* text eol=lf

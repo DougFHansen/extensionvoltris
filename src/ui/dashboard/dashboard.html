@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f9" />
+    <title>VOLTRIS Browser Shield - Dashboard</title>
+    <link rel="stylesheet" href="styles/tokens.css" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/pages.css" />
+  </head>
+  <body class="page">
+    <header class="page-header">
+      <div class="page-header-left">
+        <span id="logo-slot"></span>
+        <div class="page-title">
+          <h1 id="dash-heading"></h1>
+          <p id="dash-subtitle"></p>
+        </div>
+      </div>
+      <div class="page-header-actions">
+        <div id="theme-slot"></div>
+        <button type="button" class="btn btn-secondary" id="open-options"></button>
+        <button type="button" class="btn btn-ghost" id="refresh"></button>
+      </div>
+    </header>
+    <nav class="page-nav" id="dash-nav" role="tablist" aria-label="Dashboard sections"></nav>
+    <main class="page-main" id="dash-panels"></main>
+    <footer class="page-footer" id="dash-footer"></footer>
+    <script type="module" src="dashboard.js"></script>
+  </body>
+</html>

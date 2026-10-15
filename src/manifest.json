@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extension_name__",
+  "short_name": "__MSG_extension_short_name__",
+  "description": "__MSG_extension_description__",
+  "version": "1.1.0",
+  "default_locale": "en",
+  "minimum_chrome_version": "120",
+
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
+
+  "action": {
+    "default_title": "__MSG_extension_name__",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon-16.png",
+      "32": "assets/icons/icon-32.png",
+      "48": "assets/icons/icon-48.png",
+      "128": "assets/icons/icon-128.png"
+    }
+  },
+
+  "background": {
+    "service_worker": "background.js"
+  },
+
+  "permissions": [
+    "storage",
+    "alarms",
+    "declarativeNetRequest",
+    "webNavigation",
+    "downloads",
+    "notifications",
+    "scripting"
+  ],
+
+  "host_permissions": ["<all_urls>"],
+
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; base-uri 'none'; frame-src 'none'"
+  },
+
+  "declarative_net_request": {
+    "rule_resources": []
+  }
+}

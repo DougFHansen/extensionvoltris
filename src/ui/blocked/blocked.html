@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f9" />
+    <meta name="referrer" content="no-referrer" />
+    <title>VOLTRIS Browser Shield</title>
+    <link rel="stylesheet" href="styles/tokens.css" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/blocked.css" />
+  </head>
+  <body class="blocked">
+    <main id="app" class="blocked-app" aria-busy="true">
+      <div class="popup-loading">
+        <span class="spinner" aria-hidden="true"></span>
+      </div>
+    </main>
+    <script type="module" src="blocked.js"></script>
+  </body>
+</html>

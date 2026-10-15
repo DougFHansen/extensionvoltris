@@ -1,0 +1,1347 @@
+{
+  "about_attribution": {
+    "message": "Threat data provided by Phishing.Database (MIT), the StevenBlack hosts project (MIT) and the EasyList authors (CC BY-SA 3.0)."
+  },
+  "about_license": {
+    "message": "Licence"
+  },
+  "about_source": {
+    "message": "Source code"
+  },
+  "about_third_party": {
+    "message": "Third-party notices"
+  },
+  "about_title": {
+    "message": "About"
+  },
+  "about_version": {
+    "message": "Version"
+  },
+  "app_tagline": {
+    "message": "Protection that explains itself"
+  },
+  "blocked_advanced_button": {
+    "message": "Continue to this site"
+  },
+  "blocked_advanced_required": {
+    "message": "Confirm the warning first"
+  },
+  "blocked_advanced_title": {
+    "message": "Continue anyway"
+  },
+  "blocked_advanced_toggle": {
+    "message": "I understand the risk"
+  },
+  "blocked_advanced_warning": {
+    "message": "This destination matched a verified threat feed. Continuing exposes you to a confirmed risk. Only continue if you are certain the identification is wrong, and report a false positive if that is the case."
+  },
+  "blocked_allow_site": {
+    "message": "Allow this site"
+  },
+  "blocked_allowlist_added": {
+    "message": "Site added to your allowlist"
+  },
+  "blocked_domain": {
+    "message": "Destination"
+  },
+  "blocked_go_back": {
+    "message": "Go back"
+  },
+  "blocked_go_home": {
+    "message": "Return to a safe page"
+  },
+  "blocked_matched_domain": {
+    "message": "Matched list entry",
+    "description": "Shown on the block page when the blocked host matched a parent domain in the threat list."
+  },
+  "blocked_no_details": {
+    "message": "Detailed information is no longer available."
+  },
+  "blocked_open_dashboard": {
+    "message": "Open dashboard"
+  },
+  "blocked_reason": {
+    "message": "Why this was blocked"
+  },
+  "blocked_reports_no_content_scan": {
+    "message": "VOLTRIS does not scan file contents and does not replace your browser's own download protections."
+  },
+  "blocked_source": {
+    "message": "Identified by"
+  },
+  "blocked_source_date": {
+    "message": "Information dated"
+  },
+  "blocked_title": {
+    "message": "Navigation blocked"
+  },
+  "blocked_type": {
+    "message": "Threat type"
+  },
+  "brand_adobe": {
+    "message": "Adobe"
+  },
+  "brand_aliexpress": {
+    "message": "AliExpress"
+  },
+  "brand_amazon": {
+    "message": "Amazon"
+  },
+  "brand_apple": {
+    "message": "Apple"
+  },
+  "brand_aws": {
+    "message": "Amazon Web Services"
+  },
+  "brand_bankofamerica": {
+    "message": "Bank of America"
+  },
+  "brand_bb": {
+    "message": "Banco do Brasil"
+  },
+  "brand_bcb": {
+    "message": "Banco Central do Brasil"
+  },
+  "brand_bradesco": {
+    "message": "Bradesco"
+  },
+  "brand_chase": {
+    "message": "Chase"
+  },
+  "brand_citibank": {
+    "message": "CitiBank"
+  },
+  "brand_claro": {
+    "message": "Claro"
+  },
+  "brand_cloudflare": {
+    "message": "Cloudflare"
+  },
+  "brand_correios": {
+    "message": "Correios"
+  },
+  "brand_dhl": {
+    "message": "DHL"
+  },
+  "brand_dropbox": {
+    "message": "Dropbox"
+  },
+  "brand_fedex": {
+    "message": "FedEx"
+  },
+  "brand_github": {
+    "message": "GitHub"
+  },
+  "brand_gitlab": {
+    "message": "GitLab"
+  },
+  "brand_google": {
+    "message": "Google"
+  },
+  "brand_gov_br": {
+    "message": "Governo do Brasil"
+  },
+  "brand_inss": {
+    "message": "INSS"
+  },
+  "brand_inter": {
+    "message": "Banco Inter"
+  },
+  "brand_itau": {
+    "message": "Itau"
+  },
+  "brand_lastpass": {
+    "message": "LastPass"
+  },
+  "brand_mastercard": {
+    "message": "Mastercard"
+  },
+  "brand_mercadolivre": {
+    "message": "Mercado Livre"
+  },
+  "brand_mercadopago": {
+    "message": "Mercado Pago"
+  },
+  "brand_microsoft": {
+    "message": "Microsoft"
+  },
+  "brand_mozilla": {
+    "message": "Mozilla"
+  },
+  "brand_net": {
+    "message": "NET"
+  },
+  "brand_nubank": {
+    "message": "Nubank"
+  },
+  "brand_office": {
+    "message": "Microsoft Office"
+  },
+  "brand_oi": {
+    "message": "Oi"
+  },
+  "brand_outlook": {
+    "message": "Outlook"
+  },
+  "brand_pagseguro": {
+    "message": "PagSeguro"
+  },
+  "brand_payoneer": {
+    "message": "Payoneer"
+  },
+  "brand_paypal": {
+    "message": "PayPal"
+  },
+  "brand_receita": {
+    "message": "Receita Federal"
+  },
+  "brand_santander": {
+    "message": "Santander"
+  },
+  "brand_shopify": {
+    "message": "Shopify"
+  },
+  "brand_tim": {
+    "message": "TIM"
+  },
+  "brand_ups": {
+    "message": "UPS"
+  },
+  "brand_visa": {
+    "message": "Visa"
+  },
+  "brand_vivo": {
+    "message": "Vivo"
+  },
+  "brand_wellsfargo": {
+    "message": "Wells Fargo"
+  },
+  "brand_westernunion": {
+    "message": "Western Union"
+  },
+  "category_ad": {
+    "message": "Ads and intrusive resources"
+  },
+  "category_malware": {
+    "message": "Malware"
+  },
+  "category_malware_distribution": {
+    "message": "Malware distribution"
+  },
+  "category_phishing": {
+    "message": "Phishing"
+  },
+  "category_scam": {
+    "message": "Scam infrastructure"
+  },
+  "category_tracker": {
+    "message": "Trackers"
+  },
+  "common_add": {
+    "message": "Add"
+  },
+  "common_advanced": {
+    "message": "Advanced"
+  },
+  "common_all": {
+    "message": "All"
+  },
+  "common_back": {
+    "message": "Back"
+  },
+  "common_cancel": {
+    "message": "Cancel"
+  },
+  "common_close": {
+    "message": "Close"
+  },
+  "common_copied": {
+    "message": "Copied"
+  },
+  "common_copy": {
+    "message": "Copy"
+  },
+  "common_default": {
+    "message": "Default"
+  },
+  "common_delete": {
+    "message": "Delete"
+  },
+  "common_disabled": {
+    "message": "Disabled"
+  },
+  "common_enabled": {
+    "message": "Enabled"
+  },
+  "common_error": {
+    "message": "Something went wrong"
+  },
+  "common_learn_more": {
+    "message": "Learn more"
+  },
+  "common_loading": {
+    "message": "Loading"
+  },
+  "common_more": {
+    "message": "More details"
+  },
+  "common_never": {
+    "message": "Never"
+  },
+  "common_no": {
+    "message": "No"
+  },
+  "common_none": {
+    "message": "None"
+  },
+  "common_off": {
+    "message": "Off"
+  },
+  "common_on": {
+    "message": "On"
+  },
+  "common_optional": {
+    "message": "Optional"
+  },
+  "common_refresh": {
+    "message": "Refresh"
+  },
+  "common_remove": {
+    "message": "Remove"
+  },
+  "common_required": {
+    "message": "Required"
+  },
+  "common_retry": {
+    "message": "Retry"
+  },
+  "common_save": {
+    "message": "Save"
+  },
+  "common_unknown": {
+    "message": "Unknown"
+  },
+  "common_yes": {
+    "message": "Yes"
+  },
+  "dash_clear_history": {
+    "message": "Clear event history"
+  },
+  "dash_filters": {
+    "message": "Filters"
+  },
+  "dash_history_cleared": {
+    "message": "Event history cleared"
+  },
+  "dash_last_14_days": {
+    "message": "Blocked pages over the last 14 days"
+  },
+  "dash_no_events": {
+    "message": "No security events recorded yet"
+  },
+  "dash_no_events_hint": {
+    "message": "Events appear here when protection blocks something."
+  },
+  "dash_no_sites": {
+    "message": "No sites allowed"
+  },
+  "dash_no_sites_hint": {
+    "message": "Add a site when protection gets in your way."
+  },
+  "dash_resources_active": {
+    "message": "Active capabilities"
+  },
+  "dash_show_all": {
+    "message": "Show all"
+  },
+  "dash_statistics_by_category": {
+    "message": "Blocked pages by category"
+  },
+  "dash_subtitle": {
+    "message": "Security dashboard"
+  },
+  "dash_summary": {
+    "message": "Security summary"
+  },
+  "dash_summary_scope": {
+    "message": "Block counts below are top-level pages we observed being blocked. They are not per-request counts; see the panel that follows.",
+    "description": "Clarifies the scope of the summary tiles on the dashboard overview tab."
+  },
+  "dash_tab_events": {
+    "message": "Events"
+  },
+  "dash_tab_lists": {
+    "message": "Lists"
+  },
+  "dash_tab_overview": {
+    "message": "Overview"
+  },
+  "dash_tab_permissions": {
+    "message": "Permissions"
+  },
+  "dash_tab_privacy": {
+    "message": "Privacy"
+  },
+  "dash_tab_resources": {
+    "message": "Resources"
+  },
+  "dash_tab_sites": {
+    "message": "Sites"
+  },
+  "dash_title": {
+    "message": "VOLTRIS Browser Shield"
+  },
+  "dash_top_blocked": {
+    "message": "Most blocked domains"
+  },
+  "dash_what_we_measure": {
+    "message": "What these numbers mean",
+    "description": "Title of the panel that discloses exactly which metrics can be observed in a published extension."
+  },
+  "diag_copied": {
+    "message": "Report copied to the clipboard"
+  },
+  "diag_copy": {
+    "message": "Copy report"
+  },
+  "diag_integration_note": {
+    "message": "Features that need infrastructure we do not operate are marked clearly instead of being simulated."
+  },
+  "diag_integration_title": {
+    "message": "Integration status"
+  },
+  "diag_limits_dynamic": {
+    "message": "Safe dynamic rules"
+  },
+  "diag_limits_regex": {
+    "message": "Regular expression rules"
+  },
+  "diag_limits_session": {
+    "message": "Session rules"
+  },
+  "diag_limits_title": {
+    "message": "Browser rule limits"
+  },
+  "diag_limits_unsafe": {
+    "message": "Unsafe dynamic rules"
+  },
+  "diag_reapplied": {
+    "message": "Rules re-applied"
+  },
+  "diag_reapply": {
+    "message": "Re-apply rules"
+  },
+  "diag_rules": {
+    "message": "Rules"
+  },
+  "diag_rules_budget": {
+    "message": "Budget"
+  },
+  "diag_rules_dropped": {
+    "message": "Dropped for quota"
+  },
+  "diag_rules_duplicates": {
+    "message": "Duplicates removed"
+  },
+  "diag_rules_installed": {
+    "message": "Installed"
+  },
+  "diag_rules_rejected": {
+    "message": "Rejected (invalid host)"
+  },
+  "diag_rules_truncated": {
+    "message": "Truncated categories"
+  },
+  "diag_runtime": {
+    "message": "Runtime"
+  },
+  "diag_runtime_browser": {
+    "message": "Browser"
+  },
+  "diag_runtime_service_worker": {
+    "message": "Service worker"
+  },
+  "diag_title": {
+    "message": "Diagnostics"
+  },
+  "download_alert_caution": {
+    "message": "Check this download"
+  },
+  "download_alert_dangerous": {
+    "message": "Suspicious download"
+  },
+  "download_alert_safe": {
+    "message": "Download"
+  },
+  "error_forbidden_sender": {
+    "message": "This message type is not allowed from a web page."
+  },
+  "error_generic": {
+    "message": "Unexpected error. Try again."
+  },
+  "error_invalid_domain": {
+    "message": "That is not a valid domain name."
+  },
+  "error_invalid_message": {
+    "message": "Rejected an invalid internal message."
+  },
+  "error_invalid_payload": {
+    "message": "Rejected a message with an invalid payload."
+  },
+  "error_no_response": {
+    "message": "The background service did not answer."
+  },
+  "error_not_configured": {
+    "message": "This provider is not configured."
+  },
+  "error_not_found": {
+    "message": "Entry not found."
+  },
+  "error_service_worker": {
+    "message": "The extension is starting up. Try again in a moment."
+  },
+  "error_storage_full": {
+    "message": "Local storage is full. Clear data in the Privacy tab."
+  },
+  "error_update_failed": {
+    "message": "The update failed. The previous list was kept."
+  },
+  "event_ad_blocked": {
+    "message": "Ad blocked"
+  },
+  "event_allowlist_changed": {
+    "message": "Allowlist changed"
+  },
+  "event_download_flagged": {
+    "message": "Download flagged"
+  },
+  "event_list_error": {
+    "message": "Threat list update failed"
+  },
+  "event_list_updated": {
+    "message": "Threat lists updated"
+  },
+  "event_scam_signals": {
+    "message": "Scam signals on page"
+  },
+  "event_suspicious_detected": {
+    "message": "Suspicious site detected"
+  },
+  "event_threat_blocked": {
+    "message": "Threat blocked"
+  },
+  "event_tracker_blocked": {
+    "message": "Tracker blocked"
+  },
+  "extension_description": {
+    "message": "Blocks phishing, malware, scams, trackers and ads. Everything runs on your device. No account, no tracking, no data collection.",
+    "description": "Chrome caps description at 132 characters. Store limits are enforced by tests/unit/store-limits.test.ts."
+  },
+  "extension_description_long": {
+    "message": "VOLTRIS Browser Shield analyses every navigation locally, combining verified threat feeds with Unicode, impersonation and URL-structure heuristics. Blocks known malicious destinations, warns about deceptive links, reduces tracking and flags suspicious downloads. Everything runs on your device: no browsing history, passwords, cookies or tokens are collected or sent anywhere.",
+    "description": "Long description for the store listing."
+  },
+  "extension_name": {
+    "message": "VOLTRIS Browser Shield",
+    "description": "Extension name shown in the browser UI."
+  },
+  "extension_short_name": {
+    "message": "VOLTRIS",
+    "description": "Chrome caps short_name at 12 characters and prefers no spaces. The full name still appears in the store and in chrome://extensions."
+  },
+  "hover_known_malicious": {
+    "message": "VOLTRIS: this link points to a known malicious destination."
+  },
+  "hover_suspicious": {
+    "message": "VOLTRIS: this link shows signs of impersonation or deception."
+  },
+  "lists_auto_update": {
+    "message": "Automatic updates"
+  },
+  "lists_data_only": {
+    "message": "Only data is downloaded. No code is fetched or executed."
+  },
+  "lists_entries": {
+    "message": "Entries"
+  },
+  "lists_format": {
+    "message": "Format"
+  },
+  "lists_frequency": {
+    "message": "Frequency"
+  },
+  "lists_hash": {
+    "message": "Content hash (SHA-256)"
+  },
+  "lists_interval": {
+    "message": "Update interval"
+  },
+  "lists_interval_hours": {
+    "message": "$1 hour(s)"
+  },
+  "lists_license": {
+    "message": "License"
+  },
+  "lists_no_provider": {
+    "message": "No provider data yet"
+  },
+  "lists_open_source": {
+    "message": "Open source page"
+  },
+  "lists_revision": {
+    "message": "Dataset revision"
+  },
+  "lists_rules": {
+    "message": "Rules installed"
+  },
+  "lists_skipped": {
+    "message": "Records not converted"
+  },
+  "lists_source": {
+    "message": "Source"
+  },
+  "lists_status": {
+    "message": "Status"
+  },
+  "lists_title": {
+    "message": "Threat intelligence"
+  },
+  "lists_update_now": {
+    "message": "Update now"
+  },
+  "lists_updated_at": {
+    "message": "Last successful update"
+  },
+  "lists_updating": {
+    "message": "Updating"
+  },
+  "metric_available": {
+    "message": "Measured"
+  },
+  "metric_detections": {
+    "message": "Analysis detections",
+    "description": "Metric label: verdicts produced by the URL analysis engine."
+  },
+  "metric_detections_hint": {
+    "message": "Pages our analysis engine flagged as suspicious, whether or not a rule blocked them.",
+    "description": "Explains what a detection means."
+  },
+  "metric_download_warnings": {
+    "message": "Download warnings",
+    "description": "Metric label: risky downloads we warned about."
+  },
+  "metric_download_warnings_hint": {
+    "message": "Downloads we checked against the browser's own dangerous-file lists.",
+    "description": "Explains the download warning counter."
+  },
+  "metric_not_available": {
+    "message": "Not measurable"
+  },
+  "metric_observed_blocks": {
+    "message": "Blocked pages",
+    "description": "Metric label: top-level navigations observed being blocked."
+  },
+  "metric_observed_blocks_hint": {
+    "message": "Counted from a blocked navigation the browser actually reported, in published builds as well as local ones.",
+    "description": "Explains how the blocked-page counter is obtained."
+  },
+  "metric_rules_installed": {
+    "message": "Filtering rules installed",
+    "description": "Metric label: installed rule count."
+  },
+  "metric_rules_installed_hint": {
+    "message": "How much protection is installed. This is a state, not a count of how many times it fired.",
+    "description": "Prevents the rule count from being read as a block count."
+  },
+  "metric_subresource_blocks": {
+    "message": "Blocked sub-resources (images, scripts, trackers)",
+    "description": "Metric label: per-request sub-resource blocking."
+  },
+  "metric_subresource_blocks_hint": {
+    "message": "Not measurable in a published extension. The browser exposes this counter only to unpacked, development builds, so we report no number rather than an invented one.",
+    "description": "Explains why the sub-resource counter is unavailable, instead of showing a false zero."
+  },
+  "opt_auto_update": {
+    "message": "Update threat lists automatically"
+  },
+  "opt_block_ads": {
+    "message": "Block ads and intrusive resources"
+  },
+  "opt_block_malware": {
+    "message": "Block known malware"
+  },
+  "opt_block_malware_distribution": {
+    "message": "Block malware distribution points"
+  },
+  "opt_block_phishing": {
+    "message": "Block known phishing"
+  },
+  "opt_block_scam": {
+    "message": "Block scam infrastructure"
+  },
+  "opt_block_third_party_only": {
+    "message": "Restrict to third-party requests"
+  },
+  "opt_block_third_party_only_hint": {
+    "message": "Recommended. Keeps first-party site functionality intact."
+  },
+  "opt_block_trackers": {
+    "message": "Block trackers"
+  },
+  "opt_credential_clear": {
+    "message": "Remove key"
+  },
+  "opt_credential_configured": {
+    "message": "Configured"
+  },
+  "opt_credential_key": {
+    "message": "API key"
+  },
+  "opt_credential_missing": {
+    "message": "No key"
+  },
+  "opt_credential_save": {
+    "message": "Save key"
+  },
+  "opt_credentials_intro": {
+    "message": "Some sources require your own API key. We never ship a third-party key and never claim an integration works without one."
+  },
+  "opt_credentials_title": {
+    "message": "Provider credentials"
+  },
+  "opt_download_action": {
+    "message": "Action for high-confidence downloads"
+  },
+  "opt_download_action_alert": {
+    "message": "Show a warning only"
+  },
+  "opt_download_action_cancel": {
+    "message": "Cancel the download"
+  },
+  "opt_download_action_hint": {
+    "message": "Cancelling uses the browser downloads API before the file is written. It never replaces the browser's own download protections."
+  },
+  "opt_download_protection": {
+    "message": "Warn about suspicious downloads"
+  },
+  "opt_hover_warnings": {
+    "message": "Warn on link hover"
+  },
+  "opt_hover_warnings_hint": {
+    "message": "Shows a small badge when the link destination carries relevant risk."
+  },
+  "opt_notifications": {
+    "message": "Show notifications"
+  },
+  "opt_phishing_engine": {
+    "message": "Heuristic URL analysis"
+  },
+  "opt_phishing_engine_hint": {
+    "message": "Detects impersonation, Unicode homographs and unusual URL structures. Produces warnings, never automatic verdicts of malice."
+  },
+  "opt_protection_enabled": {
+    "message": "Enable protection"
+  },
+  "opt_protection_enabled_hint": {
+    "message": "Master switch. When off, nothing is blocked and no page is analysed."
+  },
+  "opt_reduced_motion": {
+    "message": "Reduce motion"
+  },
+  "opt_scam_page": {
+    "message": "Analyse pages for scam patterns"
+  },
+  "opt_scam_page_hint": {
+    "message": "Looks at page structure only. Never reads what you type or your passwords."
+  },
+  "opt_store_full_urls": {
+    "message": "Store full URLs in the event history"
+  },
+  "opt_store_full_urls_hint": {
+    "message": "Off by default. When on, query strings and fragments are still removed."
+  },
+  "opt_store_history": {
+    "message": "Keep a local event history"
+  },
+  "opt_store_history_hint": {
+    "message": "Capped list of recent security events, stored on this device only."
+  },
+  "opt_theme": {
+    "message": "Appearance"
+  },
+  "opt_update_interval": {
+    "message": "Check for updates every"
+  },
+  "opt_warn_dangerous_ext": {
+    "message": "Warn about executable file types"
+  },
+  "opt_warn_dangerous_ext_hint": {
+    "message": "Informational. Legitimate installers exist, so this never blocks by itself."
+  },
+  "opt_warn_double_ext": {
+    "message": "Warn about double file extensions"
+  },
+  "perm_host_access": {
+    "message": "Host access: all web addresses"
+  },
+  "perm_host_access_hint": {
+    "message": "Required to evaluate URLs and to block requests. URLs stay on your device."
+  },
+  "perm_intro": {
+    "message": "VOLTRIS requests only the permissions below, each tied to a shipped feature."
+  },
+  "perm_missing": {
+    "message": "Missing"
+  },
+  "perm_no_justification": {
+    "message": "No justification recorded for this permission. Please report it.",
+    "description": "Fallback shown if the manifest ever declares a permission the justification table does not cover."
+  },
+  "perm_present": {
+    "message": "Granted"
+  },
+  "perm_title": {
+    "message": "Permission diagnostics"
+  },
+  "perm_unused": {
+    "message": "Declared but not used by any active feature"
+  },
+  "permission_alarms": {
+    "message": "Check for threat list updates in the background.",
+    "description": "Justification shown in the permission diagnostics table."
+  },
+  "permission_dnr": {
+    "message": "Block network requests without reading page content."
+  },
+  "permission_downloads": {
+    "message": "Warn about suspicious downloads."
+  },
+  "permission_notifications": {
+    "message": "Show download and update notifications."
+  },
+  "permission_scripting": {
+    "message": "Re-run the page analysis when you ask for it."
+  },
+  "permission_storage": {
+    "message": "Store settings and statistics locally."
+  },
+  "permission_tabs": {
+    "message": "Read the address of the current tab."
+  },
+  "permission_webnavigation": {
+    "message": "Notice when a page we block fails to load, so the block can be counted and explained.",
+    "description": "Justification shown in the permission diagnostics table."
+  },
+  "popup_allow_site": {
+    "message": "Allow this site"
+  },
+  "popup_analyse_now": {
+    "message": "Analyse now"
+  },
+  "popup_blocked_today": {
+    "message": "Blocked today"
+  },
+  "popup_blocked_total": {
+    "message": "Pages blocked"
+  },
+  "popup_current_site": {
+    "message": "Current site"
+  },
+  "popup_last_update": {
+    "message": "Lists updated"
+  },
+  "popup_never_updated": {
+    "message": "Never updated"
+  },
+  "popup_no_site": {
+    "message": "No page analysed yet"
+  },
+  "popup_no_site_hint": {
+    "message": "Open a page to analyse it."
+  },
+  "popup_open_dashboard": {
+    "message": "Open dashboard"
+  },
+  "popup_open_settings": {
+    "message": "Settings"
+  },
+  "popup_protections": {
+    "message": "Protections enabled"
+  },
+  "popup_quick_actions": {
+    "message": "Quick actions"
+  },
+  "popup_rescan_page": {
+    "message": "Re-analyse this page"
+  },
+  "popup_risk_level": {
+    "message": "Known risk level"
+  },
+  "popup_rules_active": {
+    "message": "Filtering rules",
+    "description": "Popup stat tile: number of installed blocking rules."
+  },
+  "popup_status_off": {
+    "message": "Protection paused"
+  },
+  "popup_status_ok": {
+    "message": "Protection active"
+  },
+  "popup_status_partial": {
+    "message": "Protection partially active"
+  },
+  "popup_threats_identified": {
+    "message": "Threats identified"
+  },
+  "popup_title": {
+    "message": "VOLTRIS Browser Shield"
+  },
+  "popup_toggle_ads": {
+    "message": "Ads"
+  },
+  "popup_toggle_downloads": {
+    "message": "Downloads"
+  },
+  "popup_toggle_phishing": {
+    "message": "Phishing"
+  },
+  "popup_toggle_protection": {
+    "message": "Protection"
+  },
+  "popup_toggle_trackers": {
+    "message": "Trackers"
+  },
+  "privacy_clear_all": {
+    "message": "Delete everything"
+  },
+  "privacy_clear_allowlist": {
+    "message": "Per-site exceptions"
+  },
+  "privacy_clear_history": {
+    "message": "Event history"
+  },
+  "privacy_clear_intro": {
+    "message": "Removes data stored by the extension on this device."
+  },
+  "privacy_clear_settings": {
+    "message": "Settings"
+  },
+  "privacy_clear_stats": {
+    "message": "Statistics"
+  },
+  "privacy_clear_threat": {
+    "message": "Downloaded threat data"
+  },
+  "privacy_clear_title": {
+    "message": "Delete local data"
+  },
+  "privacy_cleared": {
+    "message": "Local data deleted"
+  },
+  "privacy_intro": {
+    "message": "VOLTRIS Browser Shield is local-first. There is no account, no telemetry and no server."
+  },
+  "privacy_limits_body": {
+    "message": "The extension cannot guarantee that every malicious site is detected. Threat feeds only cover URLs that have already been reported. It does not scan file contents, cannot inspect certificate history, cannot follow server-side redirects before they happen, and never promises absolute safety. Absence of a detection is not a guarantee of safety."
+  },
+  "privacy_limits_intro": {
+    "message": "Stated plainly, because honest limits build more trust than bold claims."
+  },
+  "privacy_limits_title": {
+    "message": "Known limitations"
+  },
+  "privacy_network": {
+    "message": "Downloads threat list data from the providers listed in the Lists tab. Nothing else leaves your device."
+  },
+  "privacy_network_title": {
+    "message": "Network use"
+  },
+  "privacy_never": {
+    "message": "Browsing history"
+  },
+  "privacy_never_2": {
+    "message": "Passwords or form contents"
+  },
+  "privacy_never_3": {
+    "message": "Authentication cookies or tokens"
+  },
+  "privacy_never_4": {
+    "message": "Page contents sent anywhere"
+  },
+  "privacy_never_5": {
+    "message": "Tracking identifiers"
+  },
+  "privacy_never_title": {
+    "message": "Never collected"
+  },
+  "privacy_policy_link": {
+    "message": "Full privacy policy"
+  },
+  "privacy_storage_usage": {
+    "message": "Local storage usage"
+  },
+  "privacy_stored_2": {
+    "message": "Your settings and per-site exceptions"
+  },
+  "privacy_stored_3": {
+    "message": "Aggregated counters of observed blocks"
+  },
+  "privacy_stored_4": {
+    "message": "A capped list of recent security events (domains only by default)"
+  },
+  "privacy_stored_5": {
+    "message": "Threat list data downloaded from the sources listed in the Lists tab"
+  },
+  "privacy_stored_title": {
+    "message": "Stored locally"
+  },
+  "privacy_title": {
+    "message": "About and privacy"
+  },
+  "provider_status_active": {
+    "message": "Active"
+  },
+  "provider_status_bundled_snapshot": {
+    "message": "Bundled snapshot"
+  },
+  "provider_status_disabled": {
+    "message": "Disabled"
+  },
+  "provider_status_error": {
+    "message": "Error"
+  },
+  "provider_status_excluded_license": {
+    "message": "Excluded by licence"
+  },
+  "provider_status_not_configured": {
+    "message": "Not configured"
+  },
+  "provider_status_stale": {
+    "message": "Stale (last known good copy)"
+  },
+  "reason_brand_impersonation_domain": {
+    "message": "Looks like a protected brand"
+  },
+  "reason_brand_impersonation_subdomain": {
+    "message": "Impersonates a protected brand"
+  },
+  "reason_brand_keyword_in_host": {
+    "message": "Uses a well-known brand name"
+  },
+  "reason_coverage_allowlisted": {
+    "message": "Site is on your allowlist"
+  },
+  "reason_coverage_disabled_module": {
+    "message": "Protection module disabled"
+  },
+  "reason_coverage_no_reputation_data": {
+    "message": "Reputation data not available for this host"
+  },
+  "reason_credential_brand_on_lookalike": {
+    "message": "Authentication brand on a look-alike host"
+  },
+  "reason_deceptive_host_label": {
+    "message": "Deceptive host label"
+  },
+  "reason_download_dangerous_extension": {
+    "message": "This file type can execute code."
+  },
+  "reason_download_double_extension": {
+    "message": "The file name hides an executable behind a document extension."
+  },
+  "reason_download_from_malicious": {
+    "message": "The source appears in a verified threat feed."
+  },
+  "reason_downloads_dangerous_extension": {
+    "message": "Executable file type"
+  },
+  "reason_downloads_double_extension": {
+    "message": "Double file extension"
+  },
+  "reason_downloads_from_malicious": {
+    "message": "Comes from a known malicious source"
+  },
+  "reason_feed_known_malicious": {
+    "message": "Listed as malware by a verified feed"
+  },
+  "reason_feed_known_malware_distribution": {
+    "message": "Known malware distribution point"
+  },
+  "reason_feed_known_phishing": {
+    "message": "Listed as phishing by a verified feed"
+  },
+  "reason_feed_known_scam": {
+    "message": "Linked to scam infrastructure by a verified feed"
+  },
+  "reason_feed_list_truncated": {
+    "message": "List truncated to fit the browser rule limit"
+  },
+  "reason_ip_literal_host": {
+    "message": "Uses a raw IP address instead of a domain"
+  },
+  "reason_punycode_homograph": {
+    "message": "Punycode homograph attack"
+  },
+  "reason_redirect_to_threat": {
+    "message": "Redirects to a known threat"
+  },
+  "reason_scam_browser_update_claim": {
+    "message": "Claims to be a browser update"
+  },
+  "reason_scam_credential_form": {
+    "message": "Requests credentials in an unusual context"
+  },
+  "reason_scam_fake_virus_alert": {
+    "message": "Displays a fake virus alert"
+  },
+  "reason_scam_software_install_prompt": {
+    "message": "Pressures to install software"
+  },
+  "reason_shortener_unresolved": {
+    "message": "Link shortened, real destination hidden"
+  },
+  "reason_suspicious_tld_risk": {
+    "message": "Top-level domain frequently abused"
+  },
+  "reason_suspicious_url_shape": {
+    "message": "Unusual URL structure"
+  },
+  "reason_unicode_bidi_control": {
+    "message": "Invisible bidirectional control characters"
+  },
+  "reason_unicode_confusable": {
+    "message": "Characters that imitate other letters"
+  },
+  "reason_unicode_mixed_script": {
+    "message": "Mixed Unicode scripts in the domain"
+  },
+  "resource_allowlist": {
+    "message": "Per-site exceptions"
+  },
+  "resource_allowlist_hint": {
+    "message": "$1 active exception(s)."
+  },
+  "resource_dnr": {
+    "message": "Network blocking (declarativeNetRequest)"
+  },
+  "resource_dnr_hint": {
+    "message": "$1 of $2 rules installed."
+  },
+  "resource_downloads": {
+    "message": "Download warnings"
+  },
+  "resource_downloads_hint": {
+    "message": "$1"
+  },
+  "resource_feedback": {
+    "message": "Block accounting"
+  },
+  "resource_feedback_hint": {
+    "message": "Counts come from events the browser actually reported.",
+    "description": "Short note under the block accounting capability row."
+  },
+  "resource_hover": {
+    "message": "Link inspection on hover"
+  },
+  "resource_hover_hint": {
+    "message": "Shows a discreet warning when a link carries relevant risk."
+  },
+  "resource_psl": {
+    "message": "Public Suffix List"
+  },
+  "resource_psl_hint": {
+    "message": "$1 rules, loaded from $2."
+  },
+  "resource_scams": {
+    "message": "Page scam analysis"
+  },
+  "resource_scams_hint": {
+    "message": "Checks page structure. Never reads what you type."
+  },
+  "resources_title": {
+    "message": "Active capabilities"
+  },
+  "settings_title": {
+    "message": "Settings"
+  },
+  "shortener_1url": {
+    "message": "1url.com"
+  },
+  "shortener_adfly": {
+    "message": "AdFly"
+  },
+  "shortener_bitly": {
+    "message": "Bitly"
+  },
+  "shortener_buffly": {
+    "message": "Buff.ly"
+  },
+  "shortener_clckru": {
+    "message": "clck.ru"
+  },
+  "shortener_cuttly": {
+    "message": "Cutt.ly"
+  },
+  "shortener_dbtt": {
+    "message": "Dropbox"
+  },
+  "shortener_googl": {
+    "message": "goo.gl"
+  },
+  "shortener_isgd": {
+    "message": "is.gd"
+  },
+  "shortener_lnkd": {
+    "message": "LinkedIn"
+  },
+  "shortener_mcafee": {
+    "message": "mcaf.ee"
+  },
+  "shortener_ouoio": {
+    "message": "ouo.io"
+  },
+  "shortener_owly": {
+    "message": "ow.ly"
+  },
+  "shortener_qrae": {
+    "message": "QR.ae"
+  },
+  "shortener_rbgy": {
+    "message": "rb.gy"
+  },
+  "shortener_rebrandly": {
+    "message": "Rebrandly"
+  },
+  "shortener_shortest": {
+    "message": "shorte.st"
+  },
+  "shortener_shorturlat": {
+    "message": "ShortURL.at"
+  },
+  "shortener_shorturlgg": {
+    "message": "shorturl.gg"
+  },
+  "shortener_sid": {
+    "message": "s.id"
+  },
+  "shortener_soogd": {
+    "message": "soo.gd"
+  },
+  "shortener_tco": {
+    "message": "X (t.co)"
+  },
+  "shortener_tinycc": {
+    "message": "tiny.cc"
+  },
+  "shortener_tinyurl": {
+    "message": "TinyURL"
+  },
+  "shortener_tly": {
+    "message": "t.ly"
+  },
+  "shortener_tribal": {
+    "message": "Trib.al"
+  },
+  "shortener_uto": {
+    "message": "u.to"
+  },
+  "shortener_vgd": {
+    "message": "v.gd"
+  },
+  "sites_add_title": {
+    "message": "Allow a site"
+  },
+  "sites_added": {
+    "message": "Site added"
+  },
+  "sites_current_site": {
+    "message": "Current site"
+  },
+  "sites_domain_placeholder": {
+    "message": "example.com"
+  },
+  "sites_invalid_domain": {
+    "message": "Enter a valid domain name"
+  },
+  "sites_remove_confirm": {
+    "message": "Remove $1 from the allowlist?"
+  },
+  "sites_removed": {
+    "message": "Site removed"
+  },
+  "sites_scope_all": {
+    "message": "Disable all protection"
+  },
+  "sites_scope_all_hint": {
+    "message": "Stops every block for this site, including malware. Use with caution."
+  },
+  "sites_scope_privacy": {
+    "message": "Allow ads and trackers only"
+  },
+  "sites_scope_privacy_hint": {
+    "message": "Recommended. Malware and phishing protection stays active."
+  },
+  "sites_scope_threats": {
+    "message": "Allow phishing and malware requests"
+  },
+  "sites_scope_threats_hint": {
+    "message": "Keeps the site itself blocked for top-level navigation, but lets sub-requests through."
+  },
+  "tab_about": {
+    "message": "About and privacy"
+  },
+  "tab_diagnostics": {
+    "message": "Diagnostics"
+  },
+  "tab_downloads": {
+    "message": "Downloads"
+  },
+  "tab_phishing": {
+    "message": "Phishing and scams"
+  },
+  "tab_privacy": {
+    "message": "Privacy and trackers"
+  },
+  "tab_sites": {
+    "message": "Allowed / blocked sites"
+  },
+  "tab_updates": {
+    "message": "Updates"
+  },
+  "tab_web_protection": {
+    "message": "Web protection"
+  },
+  "theme_dark": {
+    "message": "Dark"
+  },
+  "theme_light": {
+    "message": "Light"
+  },
+  "theme_system": {
+    "message": "Match system"
+  },
+  "verdict_known_malicious": {
+    "message": "Known malicious"
+  },
+  "verdict_known_malicious_hint": {
+    "message": "This destination is present in a verified threat feed. Confidence: high."
+  },
+  "verdict_no_threat_found": {
+    "message": "No threat identified"
+  },
+  "verdict_no_threat_found_hint": {
+    "message": "No evidence was found in the data we hold. This does not guarantee safety."
+  },
+  "verdict_not_analyzed": {
+    "message": "Not analysed"
+  },
+  "verdict_not_analyzed_hint": {
+    "message": "There was not enough coverage or data to reach a conclusion."
+  },
+  "verdict_suspicious": {
+    "message": "Suspicious"
+  },
+  "verdict_suspicious_hint": {
+    "message": "Heuristic signals were detected. This is not a proof of malice."
+  }
+}

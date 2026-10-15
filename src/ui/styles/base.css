@@ -1,0 +1,567 @@
+/* VOLTRIS Browser Shield - shared component styles. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--vbs-font);
+  font-size: var(--vbs-fs-base);
+  line-height: 1.5;
+  color: var(--vbs-text);
+  background: var(--vbs-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, p, ul, ol, figure {
+  margin: 0;
+  padding: 0;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+a {
+  color: var(--vbs-brand-500);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--vbs-focus-ring);
+  border-radius: var(--vbs-r-sm);
+}
+
+::selection {
+  background: var(--vbs-brand-glow);
+}
+
+/* ------------------------------------------------------------- primitives */
+
+.card {
+  background: var(--vbs-surface);
+  border: 1px solid var(--vbs-border);
+  border-radius: var(--vbs-r-lg);
+  box-shadow: var(--vbs-shadow-1);
+  overflow: hidden;
+}
+
+.card + .card {
+  margin-top: var(--vbs-sp-4);
+}
+
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--vbs-sp-3);
+  padding: var(--vbs-sp-4) var(--vbs-sp-4) var(--vbs-sp-3);
+  border-bottom: 1px solid var(--vbs-border);
+}
+
+.card-title {
+  font-size: var(--vbs-fs-md);
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+.card-subtitle {
+  margin-top: 2px;
+  font-size: var(--vbs-fs-sm);
+  color: var(--vbs-text-muted);
+}
+
+.card-actions {
+  display: flex;
+  gap: var(--vbs-sp-2);
+  flex-shrink: 0;
+}
+
+.card-body {
+  padding: var(--vbs-sp-4);
+}
+
+.card-body > * + * {
+  margin-top: var(--vbs-sp-3);
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--vbs-sp-2);
+  min-height: 32px;
+  padding: 0 var(--vbs-sp-3);
+  border: 1px solid transparent;
+  border-radius: var(--vbs-r-sm);
+  font: inherit;
+  font-size: var(--vbs-fs-sm);
+  font-weight: 560;
+  cursor: pointer;
+  transition: background var(--vbs-transition), border-color var(--vbs-transition), color var(--vbs-transition);
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--vbs-brand-500);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--vbs-brand-600);
+}
+
+.btn-secondary {
+  background: var(--vbs-surface-2);
+  color: var(--vbs-text);
+  border-color: var(--vbs-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--vbs-surface-3);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--vbs-text-muted);
+  border-color: transparent;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--vbs-surface-2);
+  color: var(--vbs-text);
+}
+
+.btn-danger {
+  background: var(--vbs-danger-bg);
+  color: var(--vbs-danger);
+  border-color: currentColor;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: var(--vbs-danger);
+  color: #ffffff;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* ----------------------------------------------------------------- switch */
+
+.switch-row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vbs-sp-3);
+  padding: var(--vbs-sp-2) 0;
+}
+
+/*
+ * The native checkbox is transparent but covers the whole row, so the entire
+ * row is a single, reliable hit target. A 1x1 visually-hidden input instead
+ * lands wherever its static position happens to be, which breaks pointer
+ * targeting and is hostile to touch and motor-impaired users.
+ */
+.switch-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.switch {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--vbs-sp-3);
+  flex: 1;
+  cursor: pointer;
+}
+
+.switch-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: var(--vbs-r-full);
+  background: var(--vbs-surface-3);
+  border: 1px solid var(--vbs-border-strong);
+  transition: background var(--vbs-transition), border-color var(--vbs-transition);
+}
+
+.switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--vbs-surface);
+  box-shadow: var(--vbs-shadow-1);
+  transition: transform var(--vbs-transition);
+}
+
+.switch-input:checked + .switch .switch-track {
+  background: var(--vbs-brand-500);
+  border-color: var(--vbs-brand-500);
+}
+
+.switch-input:checked + .switch .switch-track .switch-thumb {
+  transform: translateX(16px);
+  background: #ffffff;
+}
+
+.switch-input:focus-visible + .switch .switch-track {
+  box-shadow: var(--vbs-focus-ring);
+}
+
+.switch-input:disabled + .switch {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.switch-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.switch-label {
+  font-weight: 550;
+}
+
+.switch-hint {
+  font-size: var(--vbs-fs-sm);
+  color: var(--vbs-text-muted);
+}
+
+/* ----------------------------------------------------------------- badges */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--vbs-sp-2);
+  border-radius: var(--vbs-r-full);
+  font-size: var(--vbs-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.badge-ok { background: var(--vbs-ok-bg); color: var(--vbs-ok); }
+.badge-warn { background: var(--vbs-warn-bg); color: var(--vbs-warn); }
+.badge-danger { background: var(--vbs-danger-bg); color: var(--vbs-danger); }
+.badge-info { background: var(--vbs-info-bg); color: var(--vbs-info); }
+.badge-neutral { background: var(--vbs-neutral-bg); color: var(--vbs-text-muted); }
+
+/* ------------------------------------------------------------------ stats */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--vbs-sp-3);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--vbs-sp-3);
+  border: 1px solid var(--vbs-border);
+  border-radius: var(--vbs-r-md);
+  background: var(--vbs-surface-2);
+}
+
+.stat-label {
+  font-size: var(--vbs-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--vbs-text-muted);
+}
+
+.stat-value {
+  font-size: var(--vbs-fs-xl);
+  font-weight: 640;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-hint {
+  font-size: var(--vbs-fs-xs);
+  color: var(--vbs-text-faint);
+}
+
+.stat-ok .stat-value { color: var(--vbs-ok); }
+.stat-warn .stat-value { color: var(--vbs-warn); }
+.stat-danger .stat-value { color: var(--vbs-danger); }
+.stat-info .stat-value { color: var(--vbs-info); }
+
+/* ------------------------------------------------- metric disclosure list */
+
+/*
+ * The "what these numbers mean" panel.
+ *
+ * An unavailable metric is kept in the list and rendered muted rather than
+ * being hidden: a user seeing no row cannot tell "we cannot measure this" from
+ * "we forgot to measure this", and a missing row reads as a false zero.
+ */
+.metric-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--vbs-sp-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.metric-row {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr auto;
+  align-items: start;
+  gap: var(--vbs-sp-3);
+  padding: var(--vbs-sp-3);
+  border: 1px solid var(--vbs-border);
+  border-radius: var(--vbs-r-md);
+  background: var(--vbs-surface-2);
+}
+
+.metric-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--vbs-ok-bg);
+  color: var(--vbs-ok);
+  font-size: var(--vbs-fs-xs);
+  font-weight: 700;
+}
+
+.metric-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.metric-text strong {
+  font-size: var(--vbs-fs-sm);
+  font-weight: 600;
+}
+
+.metric-state {
+  align-self: center;
+  padding: 2px var(--vbs-sp-2);
+  border-radius: var(--vbs-r-sm);
+  background: var(--vbs-ok-bg);
+  color: var(--vbs-ok);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.metric-row.is-unavailable {
+  border-style: dashed;
+  opacity: 0.9;
+}
+
+.metric-row.is-unavailable .metric-badge {
+  background: var(--vbs-neutral-bg);
+  color: var(--vbs-text-faint);
+}
+
+.metric-row.is-unavailable .metric-state {
+  background: var(--vbs-neutral-bg);
+  color: var(--vbs-text-muted);
+}
+
+/* ----------------------------------------------------------------- states */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--vbs-sp-2);
+  padding: var(--vbs-sp-7) var(--vbs-sp-4);
+  text-align: center;
+  color: var(--vbs-text-muted);
+}
+
+.empty-icon {
+  color: var(--vbs-brand-500);
+  opacity: 0.55;
+}
+
+.empty-title {
+  font-weight: 600;
+  color: var(--vbs-text);
+}
+
+.empty-hint {
+  font-size: var(--vbs-fs-sm);
+  max-width: 34ch;
+}
+
+.spinner-row {
+  display: flex;
+  align-items: center;
+  gap: var(--vbs-sp-2);
+  color: var(--vbs-text-muted);
+  font-size: var(--vbs-fs-sm);
+  padding: var(--vbs-sp-3) 0;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--vbs-border-strong);
+  border-top-color: var(--vbs-brand-500);
+  border-radius: 50%;
+  animation: vbs-spin 700ms linear infinite;
+}
+
+@keyframes vbs-spin {
+  to { transform: rotate(360deg); }
+}
+
+[data-reduced-motion='true'] .spinner {
+  animation-duration: 2.4s;
+}
+
+.error-box {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--vbs-sp-3);
+  border-radius: var(--vbs-r-md);
+  background: var(--vbs-danger-bg);
+  color: var(--vbs-danger);
+  font-size: var(--vbs-fs-sm);
+}
+
+.error-title {
+  font-weight: 640;
+}
+
+/* ------------------------------------------------------------------ chart */
+
+.chart-wrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.chart {
+  width: 100%;
+  height: 96px;
+}
+
+.chart-bar {
+  fill: var(--vbs-surface-3);
+}
+
+.chart-bar-active {
+  fill: var(--vbs-brand-500);
+}
+
+/* ------------------------------------------------------------------- misc */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--vbs-sp-2);
+}
+
+.row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--vbs-sp-3);
+}
+
+.stack > * + * {
+  margin-top: var(--vbs-sp-2);
+}
+
+.muted { color: var(--vbs-text-muted); }
+.faint { color: var(--vbs-text-faint); }
+.mono { font-family: var(--vbs-font-mono); font-size: var(--vbs-fs-sm); }
+.small { font-size: var(--vbs-fs-sm); }
+.nowrap { white-space: nowrap; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.divider {
+  height: 1px;
+  background: var(--vbs-border);
+  border: 0;
+  margin: var(--vbs-sp-3) 0;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.7fr) 1fr;
+  gap: var(--vbs-sp-2) var(--vbs-sp-4);
+  font-size: var(--vbs-fs-sm);
+}
+
+.kv dt {
+  color: var(--vbs-text-muted);
+}
+
+.kv dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------------------------------------------- high contrast */
+
+@media (prefers-contrast: more) {
+  :root {
+    --vbs-border: var(--vbs-text-muted);
+    --vbs-border-strong: var(--vbs-text);
+  }
+
+  .card,
+  .btn-secondary,
+  .stat {
+    border-width: 2px;
+  }
+}

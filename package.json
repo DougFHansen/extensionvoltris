@@ -1,0 +1,41 @@
+{
+  "name": "voltris-browser-shield",
+  "version": "1.1.0",
+  "private": true,
+  "description": "VOLTRIS Browser Shield - Extension de ciberseguranca para Chrome e Microsoft Edge (Manifest V3).",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "psl": "node scripts/generate-psl.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "feeds": "node scripts/fetch-feeds.mjs",
+    "prebuild": "node scripts/generate-psl.mjs && node scripts/generate-icons.mjs",
+    "build": "node scripts/build.mjs",
+    "package": "node scripts/package.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "audit:static": "node scripts/static-analysis.mjs",
+    "audit:privacy": "node scripts/privacy-audit.mjs",
+    "audit:secrets": "node scripts/scan-secrets.mjs",
+    "verify:package": "node scripts/verify-package.mjs",
+    "hooks:install": "node scripts/install-hooks.mjs",
+    "audit:deps": "npm audit --audit-level=high",
+    "verify": "npm run typecheck && npm run audit:secrets && npm run test && npm run build && npm run audit:static && npm run audit:privacy && npm run package",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true});require('node:fs').rmSync('artifacts',{recursive:true,force:true})\""
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/chrome": "^0.3.5",
+    "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "^5.0.4",
+    "typescript": "^5.7.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
+  }
+}

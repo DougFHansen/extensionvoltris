@@ -1,0 +1,16 @@
+#!/bin/sh
+# VOLTRIS - refuses to commit a file containing a credential.
+# Installed by scripts/install-hooks.mjs. Delete to disable.
+
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+if [ -z "$staged" ]; then
+  exit 0
+fi
+
+if ! node "$(git rev-parse --show-toplevel)/scripts/scan-secrets.mjs" --staged; then
+  echo ""
+  echo "  commit blocked: a credential was found in the files being committed."
+  echo "  Revoke it if it is real, then remove it and stage again."
+  exit 1
+fi
+exit 0

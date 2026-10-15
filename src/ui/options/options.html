@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f7f9" />
+    <title>VOLTRIS Browser Shield - Settings</title>
+    <link rel="stylesheet" href="styles/tokens.css" />
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/pages.css" />
+  </head>
+  <body class="page">
+    <header class="page-header">
+      <div class="page-header-left">
+        <span id="logo-slot"></span>
+        <div class="page-title">
+          <h1 id="settings-heading"></h1>
+          <p id="settings-subtitle"></p>
+        </div>
+      </div>
+      <div class="page-header-actions">
+        <div id="theme-slot"></div>
+        <button type="button" class="btn btn-secondary" id="open-dashboard"></button>
+      </div>
+    </header>
+    <nav class="page-nav" id="settings-nav" role="tablist" aria-label="Settings sections"></nav>
+    <main class="page-main" id="settings-panels"></main>
+    <footer class="page-footer" id="settings-footer"></footer>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
