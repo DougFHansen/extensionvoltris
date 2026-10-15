@@ -33,7 +33,7 @@ import { analyzeCurrentTab, analyzeWithContext } from './navigation';
 import { configureObservationPreference, observationStatus } from './observation';
 import { DOWNLOAD_LISTS } from './downloads';
 import { ensureRules, getProtectionState, getRulesMeta, previewRulePlan, refreshAndRebuild } from './rules';
-import { runUpdateCycle } from './alarms';
+import { runUpdateCycle, getCycleError } from './alarms';
 import { configuredProviderIds, loadDataset, saveCredentials, clearCredential } from '../feeds/updater';
 import { FEED_REGISTRY, providerById } from '../feeds/registry';
 import { registerScarcityScan } from '../scam/content-bridge';
@@ -193,11 +193,28 @@ async function dispatch(t: MessageType, p: unknown, sender: chrome.runtime.Messa
     case 'feeds.refresh': {
       await runUpdateCycle('manual');
       const dataset = await loadDataset();
-      return ok({ states: dataset.states, revision: dataset.revision, updatedAt: dataset.updatedAt });
+      return ok({
+        states: dataset.states,
+        revision: dataset.revision,
+        updatedAt: dataset.updatedAt,
+        // Reported so the interface can say "protection is not active" instead
+        // of implying a working install.
+        error: await getCycleError(),
+      });
     }
     case 'feeds.state': {
-      const [dataset, configured] = await Promise.all([loadDataset(), configuredProviderIds()]);
-      return ok({ states: dataset.states, revision: dataset.revision, updatedAt: dataset.updatedAt, configured });
+      const [dataset, configured, cycleError] = await Promise.all([
+        loadDataset(),
+        configuredProviderIds(),
+        getCycleError(),
+      ]);
+      return ok({
+        states: dataset.states,
+        revision: dataset.revision,
+        updatedAt: dataset.updatedAt,
+        configured,
+        cycleError,
+      });
     }
     case 'feeds.credential': {
       const { providerId, key } = p as { providerId: string; key: string };

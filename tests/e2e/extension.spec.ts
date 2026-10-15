@@ -32,7 +32,7 @@ const url = (h: ExtensionHandle, p: string) => h.url(p);
 let handle: ExtensionHandle;
 
 test.beforeAll(async () => {
-  handle = await launchWithExtension();
+  handle = await launchWithExtension({ profile: 'offline' });
 });
 
 test.afterAll(async () => {
@@ -129,7 +129,7 @@ test.describe('extension loads', () => {
   });
 
   test('the interface renders in Brazilian Portuguese', async () => {
-    const pt = await launchWithExtension({ lang: 'pt-BR' });
+    const pt = await launchWithExtension({ lang: 'pt-BR', profile: 'pt-br-browser' });
     try {
       const page = await pt.context.newPage();
       await page.goto(pt.url('popup.html'));
@@ -419,6 +419,11 @@ test.describe('language', () => {
   test('the language picker offers each language in its own words', async () => {
     const page = await handle.context.newPage();
     await page.goto(url(handle, 'popup.html'));
+    // Waits for the picker, not just the page: the popup renders asynchronously
+    // after a `get.status` round trip, so the element is briefly absent and an
+    // immediate `allInnerTexts()` returns an empty array. That flakiness looked
+    // like a language bug.
+    await expect(page.locator('#ui-language option')).toHaveCount(3);
     const options = await page.locator('#ui-language option').allInnerTexts();
     // Written in their own language, so someone who cannot read the current
     // interface can still find theirs.
@@ -467,6 +472,7 @@ test.describe('language', () => {
     // <select> elements sharing the same id.
     const page = await handle.context.newPage();
     await page.goto(url(handle, 'popup.html'));
+    await expect(page.locator('#ui-language option')).toHaveCount(3);
     for (const value of ['en', 'pt_BR', 'auto', 'pt_BR', 'en']) {
       await page.locator('#ui-language').selectOption(value);
       await page.waitForTimeout(50);
@@ -479,7 +485,7 @@ test.describe('language', () => {
   test('a pt-BR browser gets Portuguese with no configuration at all', async () => {
     // Separate browser instance with a different UI language, its own profile,
     // and no override set, so only `chrome.i18n` can explain the result.
-    const pt = await launchWithExtension({ lang: 'pt-BR' });
+    const pt = await launchWithExtension({ lang: 'pt-BR', profile: 'pt-br-browser' });
     try {
       const page = await pt.context.newPage();
       await page.goto(pt.url('popup.html'));

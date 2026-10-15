@@ -11,6 +11,7 @@
  */
 import type { ThreatCategory } from '../core/types';
 import { normalizeHostname } from '../feeds/parsers';
+import { selectEvenlyIterative } from '../security/reputation';
 import {
   planQuota,
   readRuntimeLimits,
@@ -27,8 +28,20 @@ const ALLOWLIST_SESSION_ID_BASE = 1_000;
 
 export interface CategoryDataset {
   readonly category: ThreatCategory;
+  /**
+   * Every host known for this category, already merged across providers.
+   *
+   * Budgeting happens in `buildRules`, not here: selecting at both levels made
+   * an even sample collapse back into an alphabetical prefix, which is how
+   * `static.doubleclick.net` and `pagead2.googlesyndication.com` went
+   * uninstalled despite being listed in EasyList.
+   */
   readonly hosts: ReadonlySet<string>;
-  readonly providerId: string;
+  /**
+   * Which provider listed each host, for attribution on the block page and in
+   * Diagnostics. A host only blocks under a feed that actually listed it.
+   */
+  readonly owner?: ReadonlyMap<string, string>;
   /** Lower runs first and therefore wins when the quota is tight. */
   readonly order: number;
 }
@@ -39,13 +52,40 @@ export interface CategoryDataset {
  * trackers and ads. The numbers are deliberately conservative so the extension
  * co-exists with other blockers.
  */
+/**
+ * Rule budget per category, in RULES, shared across every provider feeding that
+ * category.
+ *
+ * Sized against the 27,000 safe dynamic-rule quota Chrome grants. Threats get
+ * the majority: an ad that slips through costs a nuisance, a phishing page that
+ * slips through costs credentials.
+ *
+ * The budgets deliberately total less than the quota so that one over-supplied
+ * category cannot starve the others - the exact failure this table had, when the
+ * cap was counted per provider and the ad category installed twice its share.
+ */
+/**
+ * Install order, lowest first.
+ *
+ * When the total quota is tight, the categories installed earlier keep their
+ * share, so threats win over privacy filtering.
+ */
+const ORDER_HINT: Record<ThreatCategory, number> = {
+  malware: 0,
+  malware_distribution: 1,
+  phishing: 2,
+  scam: 3,
+  tracker: 4,
+  ad: 5,
+};
+
 const CATEGORY_BUDGET: Record<ThreatCategory, number> = {
-  malware: 4_000,
-  phishing: 14_000,
-  malware_distribution: 2_000,
-  scam: 2_000,
-  tracker: 4_000,
-  ad: 2_000,
+  malware: 5_000,
+  phishing: 13_000,
+  malware_distribution: 1_500,
+  scam: 1_500,
+  tracker: 3_500,
+  ad: 2_500,
 };
 
 export interface BuildResult {
@@ -100,16 +140,65 @@ export function buildRules(input: BuildInput): BuildResult {
   // Diagnostics would under-report how much of the feed is actually enforced.
   let droppedForCategoryCap = 0;
 
+  /*
+   * ONE SHARED BUDGET PER CATEGORY, SPENT IN MERGED ORDER.
+   *
+   * `ad` and `malware` each come from two providers (EasyList plus StevenBlack).
+   *
+   * Counting the cap per provider let `ad` install twice its documented budget,
+   * quietly consuming quota the threat categories needed.
+   *
+   * Simply capping per category was not enough either: iterating provider by
+   * provider fills the whole cap from whichever provider came first, so the
+   * second provider contributed nothing at all and its coverage vanished. The
+   * providers for a category are therefore MERGED and iterated in sorted order,
+   * so the retained rules are a spread across everything the category knows
+   * about, with each host still attributed to the provider that listed it.
+   */
+  const byCategory = new Map<ThreatCategory, { hosts: Set<string>; owner: Map<string, string> }>();
   for (const dataset of enabled) {
-    const cap = CATEGORY_BUDGET[dataset.category];
-    perCategoryCap[dataset.category] = cap;
+    let bucket = byCategory.get(dataset.category);
+    if (!bucket) {
+      bucket = { hosts: new Set<string>(), owner: new Map<string, string>() };
+      byCategory.set(dataset.category, bucket);
+    }
+    for (const host of dataset.hosts) {
+      if (!bucket.hosts.has(host)) bucket.hosts.add(host);
+    }
+    if (!dataset.owner) continue;
+    for (const [host, providerId] of dataset.owner) {
+      if (!bucket.owner.has(host)) bucket.owner.set(host, providerId);
+    }
+  }
+
+  // Categories are already ordered by `order`; keep install order stable.
+  const ordered = [...new Set(enabled.map((d) => d.category))].sort((a, b) => ORDER_HINT[a] - ORDER_HINT[b]);
+
+  for (const category of ordered) {
+    const bucket = byCategory.get(category)!;
+    const cap = CATEGORY_BUDGET[category];
+    perCategoryCap[category] = cap;
+
+    const isPrivacy = category === 'tracker' || category === 'ad';
+
+    /*
+     * ONE BUDGET OPERATION: an even stride across the whole category.
+     *
+     * Sampling here and again downstream would cancel out - a prefix of an even
+     * sample is still a prefix. This is the only place the budget is applied, so
+     * the installed rules are a uniform sample of everything the category knows.
+     */
+    const sorted = [...bucket.hosts].sort();
+    const selected = selectEvenlyIterative(sorted, cap);
+
     let added = 0;
     let skipped = 0;
+    // Everything not selected is a genuine drop and must be reported, or
+    // Diagnostics under-reports how much of the feed is actually enforced.
+    skipped += sorted.length - selected.size;
 
-    // Deterministic iteration order: the datasets are Sets built from sorted
-    // feed data, so the same truncation happens on every run.
-    for (const rawHost of dataset.hosts) {
-      if (added >= cap || compiler.size >= quota.datasetBudget) {
+    for (const rawHost of selected) {
+      if (compiler.size >= quota.datasetBudget) {
         skipped += 1;
         continue;
       }
@@ -118,18 +207,16 @@ export function buildRules(input: BuildInput): BuildResult {
       if (isAllowlistedHost(host, allowlisted)) continue;
 
       const ok = compiler.add({
-        category: dataset.category,
+        category,
         host,
-        providerId: dataset.providerId,
-        ...(dataset.category === 'tracker' || dataset.category === 'ad' ? { thirdParty: input.settings.blockThirdPartyOnly } : {}),
+        providerId: bucket.owner.get(rawHost),
+        ...(isPrivacy ? { thirdParty: input.settings.blockThirdPartyOnly } : {}),
       });
       if (ok) added += 1;
     }
 
-    if (skipped > 0) {
-      truncated.push(dataset.category);
-      droppedForCategoryCap += skipped;
-    }
+    if (skipped > 0) truncated.push(category);
+    droppedForCategoryCap += skipped;
   }
 
   const report = compiler.report();

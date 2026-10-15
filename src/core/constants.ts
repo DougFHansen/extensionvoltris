@@ -112,10 +112,52 @@ export function categoryFromRuleId(ruleId: number): ThreatCategory | null {
   return null;
 }
 
-/** Quota do storage local (chrome.storage.local) sem `unlimitedStorage`. */
+/**
+ * Default `chrome.storage.local` quota, without the `unlimitedStorage`
+ * permission. Chrome documents the limit as 10 MB and states it "can be
+ * increased by requesting the unlimitedStorage permission".
+ */
 export const STORAGE_QUOTA_BYTES = 10 * 1024 * 1024;
 
-/** Limite defensivo de 90% da quota do storage local. */
+/**
+ * Ceiling for the packed threat dataset.
+ *
+ * WHY THIS IS NOT THE STORAGE QUOTA
+ * --------------------------------
+ * This used to be 90% of the 10 MB storage quota. Measured against the real
+ * feeds on 2026-10-15, the packed dataset is:
+ *
+ *   phishing-database-domains  386,093 entries  20.83 MiB
+ *   stevenblack-hosts            73,278 entries   2.90 MiB
+ *   easylist                     50,327 entries   1.84 MiB
+ *   easyprivacy                  47,235 entries   1.91 MiB
+ *   ------------------------------------------------
+ *   total                                   27.47 MiB
+ *
+ * The old limit tripped on every fresh install. Because a fresh install has no
+ * previous dataset to preserve, the update returned "previous preserved", the
+ * rules were never built, and the extension ran with ZERO protection while
+ * reporting success. Every user, every install. The end-to-end suite never saw
+ * it because it seeds threats directly into storage, bypassing this path.
+ *
+ * With `unlimitedStorage` the browser quota is no longer the binding
+ * constraint, so the ceiling is a real engineering budget instead.
+ *
+ * WHY NOT TRUNCATE INSTEAD
+ * ------------------------
+ * Cutting the dataset down to fit an arbitrary byte budget was rejected. The
+ * feeds are sorted ASCII, not by date, so keeping the first N entries would
+ * retain only domains beginning with a few letters - a biased, arbitrary
+ * subset presented as complete. Silently dropping known phishing domains is the
+ * exact failure mode this project refuses elsewhere. 64 MiB is comfortably
+ * under the ~27 MiB real size and far below any plausible disk budget.
+ */
+export const DATASET_MAX_BYTES = 64 * 1024 * 1024;
+
+/**
+ * Defensive ceiling on local storage overall, well above the dataset, so a
+ * runaway write cannot fill the user's disk without bound.
+ */
 export const STORAGE_SOFT_LIMIT_BYTES = Math.floor(STORAGE_QUOTA_BYTES * 0.9);
 
 /** Numero maximo de eventos mantidos no historico local. */

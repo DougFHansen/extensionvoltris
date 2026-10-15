@@ -6,6 +6,7 @@
  * worker wakes, and the alarm is only a nudge.
  */
 import { FEED_MIN_UPDATE_INTERVAL_MIN } from '../core/constants';
+import { K } from '../platform/storage';
 import { getSettings } from '../data/settings';
 import { recordHistory } from '../data/history';
 import { clampInterval, configuredProviderIds, loadCredentials, loadDataset } from '../feeds/updater';
@@ -50,7 +51,9 @@ export async function runStartupTasks(): Promise<void> {
   void runUpdateCycle('startup');
 }
 
-/** Single-flight update cycle. Concurrent triggers share one run. */
+/**
+ * Single-flight update cycle. Concurrent triggers share one run.
+ */
 export function runUpdateCycle(trigger: 'alarm' | 'startup' | 'manual'): Promise<void> {
   if (cycleInFlight) return cycleInFlight;
   cycleInFlight = (async () => {
@@ -67,6 +70,8 @@ export function runUpdateCycle(trigger: 'alarm' | 'startup' | 'manual'): Promise
       const active = overview.states.filter((s) => s.status === 'active' || s.status === 'stale').length;
       const failed = overview.states.filter((s) => s.status === 'error' || s.status === 'not_configured');
 
+      await setCycleError(null);
+
       if (failed.length > 0) {
         await recordHistory({
           kind: 'list_error',
@@ -82,12 +87,59 @@ export function runUpdateCycle(trigger: 'alarm' | 'startup' | 'manual'): Promise
           storeFullUrls: settings.storeFullUrls,
         });
       }
-    } catch {
-      // Update failures surface through provider state in Diagnostics; the
-      // updater itself guarantees the previous dataset is preserved.
+    } catch (error) {
+      // A failure here means the extension is running with NO threat data, so it
+      // is blocking nothing. Swallowing it - as this used to - leaves the user
+      // believing they are protected while no rule is installed. The reason is
+      // recorded so Diagnostics and the interface can say so out loud.
+      await setCycleError({
+        trigger,
+        message: error instanceof Error ? error.message : String(error),
+        name: error instanceof Error ? error.name : 'unknown',
+        at: Date.now(),
+      });
+      try {
+        const settings = await getSettings();
+        await recordHistory({
+          kind: 'list_error',
+          domain: '',
+          providerId: `cycle:${trigger}`,
+          storeFullUrls: settings.storeFullUrls,
+        });
+      } catch {
+        /* nothing further can be done */
+      }
     } finally {
       cycleInFlight = null;
     }
   })();
   return cycleInFlight;
+}
+
+export interface CycleError {
+  readonly trigger: 'alarm' | 'startup' | 'manual';
+  readonly message: string;
+  readonly name: string;
+  readonly at: number;
+}
+
+/** Records, or clears, the reason the last update cycle failed. */
+async function setCycleError(error: CycleError | null): Promise<void> {
+  try {
+    await chrome.storage.local.set({ [K.feedCycleError]: error });
+  } catch {
+    /* storage unavailable; the UI degrades to "unknown" */
+  }
+}
+
+export async function getCycleError(): Promise<CycleError | null> {
+  try {
+    const raw = await chrome.storage.local.get(K.feedCycleError);
+    const value = raw[K.feedCycleError];
+    return value && typeof value === 'object' && typeof (value as CycleError).message === 'string'
+      ? (value as CycleError)
+      : null;
+  } catch {
+    return null;
+  }
 }

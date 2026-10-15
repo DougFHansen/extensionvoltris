@@ -596,6 +596,14 @@
   "lists_license": {
     "message": "License"
   },
+  "lists_no_data_body": {
+    "message": "No threat list could be downloaded, so nothing is being blocked right now. Check your connection and try again.",
+    "description": "States plainly that protection is inactive instead of implying a working install."
+  },
+  "lists_no_data_title": {
+    "message": "No threat data - protection is not active",
+    "description": "Shown in Settings > Updates when no provider loaded. This is a fault, not an empty state."
+  },
   "lists_no_provider": {
     "message": "No provider data yet"
   },
@@ -872,6 +880,18 @@
   },
   "popup_no_site_hint": {
     "message": "Open a page to analyse it."
+  },
+  "popup_not_protected_action": {
+    "message": "Download the lists now",
+    "description": "Triggers an immediate feed refresh from the warning panel."
+  },
+  "popup_not_protected_body": {
+    "message": "The threat lists have not been downloaded yet, so nothing is being blocked. Check your internet connection.",
+    "description": "Explains why the rule count is zero, instead of implying the extension is working."
+  },
+  "popup_not_protected_title": {
+    "message": "Protection is not active",
+    "description": "Shown when protection is enabled but no blocking rule could be installed. This must never be hidden."
   },
   "popup_open_dashboard": {
     "message": "Open dashboard"

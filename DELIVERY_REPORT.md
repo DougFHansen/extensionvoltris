@@ -1,14 +1,63 @@
-# VOLTRIS Browser Shield 1.1.0 — Delivery Report
+# VOLTRIS Browser Shield 1.2.0 — Delivery Report
 
 **Date:** 2026-10-15
 **Scope:** Independent Manifest V3 extension for Google Chrome and Microsoft Edge.
 **Status:** Implemented, compiled, tested and packaged. Installable now via "Load unpacked".
 
-> **Revision 1.1.0 — pre-publication audit.** A review of 1.0.0 identified that block
-> statistics and the explanation page depended on `declarativeNetRequest.onRuleMatchedDebug`,
-> which Chrome documents as available **only to unpacked extensions**. In a store install
-> both would have failed silently. That finding was correct; it has been fixed at the root
-> and is covered by regression tests. Details in §5.
+> **Revision 1.2.0 — the extension did not protect anyone.**
+>
+> User testing of 1.1.0 found that no phishing, malware or scam site was detected, and that
+> ads were not blocked. The cause was not a weak list or a missed heuristic: **the feed
+> pipeline produced nothing at all, so zero blocking rules were ever installed.** The popup
+> still showed protection "On".
+>
+> Every one of the 336 previous tests passed, because every one of them seeded threats
+> directly into storage and so never touched the path that was broken. Details in §5.
+
+---
+
+## 0. Read this first
+
+Three faults shipped in earlier revisions. All three shared one property: **they could not
+be seen by the tests that existed, and none of them produced an error.**
+
+| Revision | Fault | What the user saw |
+|---|---|---|
+| 1.0.0 | Statistics and the block explanation page used an API that does not exist in a published extension | Counters frozen at zero; a raw browser error page instead of our verdict |
+| 1.1.0 | The ZIP used `\` as a path separator, which the Chrome Web Store cannot read | Upload rejected; `short_name` and `description` over the store's character limits |
+| 1.1.0 | **The threat dataset exceeded the storage ceiling, so no feed was ever stored** | **No protection at all, reported as working** |
+
+The third is the reason this report leads with a warning rather than a summary. A security
+product that fails open while reporting success is worse than one that visibly breaks,
+because the user has no reason to look for the problem.
+
+---
+
+## 0b. What the 1.2.0 fix changed
+
+| | Before | After |
+|---|---|---|
+| `storage.local` ceiling | 10 MB, refused the ~27 MiB dataset | `unlimitedStorage`, ceiling raised |
+| Dataset cap | 6 MiB in the updater, 9 MiB in `persistDataset` | 64 MiB, documented with the measurements |
+| Feed download cap | 32 MiB, rejected the 65.8 MiB link feed | 128 MiB |
+| Phishing link feed URL | pointed at a file the publisher serves **empty** | pointed at the populated file |
+| Rule budget | counted **per provider**, so `ad` used 2× its share | one shared budget per category |
+| Which hosts win the budget | first N alphabetically, i.e. mostly `0.0.0.0.*` | an even stride across the whole list |
+| When no rules are installed | nothing said so | the popup and Settings both say it, in plain language |
+| When an update cycle throws | `catch {}`, silently | recorded, shown, and listed as threat data to delete |
+
+Measured on a fresh install after the fix:
+
+```
+phishing-database-domains   active    386,093 entries
+stevenblack-hosts           active     73,278 entries
+easylist                    active     50,335 entries
+easyprivacy                 active     47,235 entries
+phishing-database-links     active         (hosts extracted from 65.8 MB of URLs)
+
+dynamic rules installed: 24,000
+  phishing 13,000   malware 5,000   tracker 3,500   ads 2,500
+```
 
 ---
 
@@ -32,9 +81,10 @@
 | 14 | No sensitive data is sent without consent | **Met** | Zero runtime dependencies; privacy-lint test; **build-time privacy audit**; E2E types a password and asserts it never reaches storage |
 | 15 | The service worker survives suspension | **Met** | E2E idles, then asserts the first interaction is fully correct |
 | 16 | No excessive browser degradation | **Met** | Event-driven only; no `setInterval`; no permanent `MutationObserver`; PSL loaded lazily |
-| 17 | Automated tests pass | **Met** | **280 unit + 28 end-to-end = 308 passing** |
+| 17 | Automated tests pass | **Met** | **319 unit + 46 end-to-end = 365 passing** |
 | 18 | Privacy policy ready | **Met** | `PRIVACY.md`, shipped inside the package, claims machine-verified by `npm run audit:privacy` |
 | 19 | Chrome/Edge packages generated | **Met** | `artifacts/*.zip` + `SHA256SUMS.txt` |
+| **20** | **Blocking rules are actually installed on a real install** | **Met (after a serious fault)** | `tests/e2e/feeds.spec.ts` downloads the **real** feeds and asserts >1,000 rules exist. This is the criterion that was previously unverified and was silently failing |
 
 ---
 
@@ -43,12 +93,13 @@
 | Gate | Command | Result |
 |---|---|---|
 | Type safety | `npm run typecheck` | **0 errors** (`strict`, `noUncheckedIndexedAccess`) |
-| Unit + integration | `npm test` | **280 passed / 12 files** |
-| Unit coverage (unit-testable code) | `npm run test:coverage` | **79.8% statements, 72.7% branches, 75.3% functions** |
-| Build | `npm run build` | `dist/chrome` and `dist/edge`, 444 KiB each |
+| Unit + integration | `npm test` | **319 passed / 14 files** |
+| Build | `npm run build` | `dist/chrome` and `dist/edge` |
 | Static analysis of the **built** package | `npm run audit:static` | **Pass** — CSP, permissions, no eval, no remote code, no inline scripts, no unexpected hosts, **no development-only API** |
 | Privacy audit of the **built** package | `npm run audit:privacy` | **Pass** — no data-collection path; per-claim evidence printed |
-| End-to-end in real Chromium | `npm run test:e2e` | **28 passed** |
+| End-to-end, offline | `npm run test:e2e -- --project=chromium-extension` | **36 passed** |
+| **End-to-end, real threat feeds** | `npm run test:e2e:live` | **10 passed** — real download, real rules, real block |
+| Packaged archive loads | `npm run verify:package` | **Pass** |
 | Dependency audit | `npm audit --audit-level=high` | **0 vulnerabilities** |
 | Package | `npm run package` | 126 KiB per target |
 
@@ -126,10 +177,150 @@ valuable part of the delivery:
 14. **A static-analysis check was silently inspecting the wrong build.** `verify` ran the
     audits *before* `build`, so they validated the previous run's output. Found while
     auditing the audit; ordering corrected.
+15. **The store archive used `\` as a path separator.** PowerShell's `Compress-Archive` on
+    Windows PowerShell 5.1 writes backslashes, which violates APPNOTE 4.4.17.1 and which the
+    Chrome Web Store cannot read. Replaced with a dependency-free ZIP writer, verified by
+    reading the archive back with .NET — an implementation we did not write — and by
+    loading the extracted package into a real browser.
+16. **`short_name` was 14 characters against a 12-character store limit, and `description`
+    was 198 against 132.** Both would have been rejected at upload, with an error that does
+    not name the field. `tests/unit/store-limits.test.ts` now pins both in both locales.
+17. **The Settings button did nothing.** `chrome.runtime.openOptionsPage()` requires the
+    manifest to declare `options_ui` or `options_page`; ours declared neither, so the button
+    rendered correctly and silently failed. Found by the user, confirmed by the
+    `Could not create an options page` error in their console.
+18. **The dashboard did not follow the language override.** It wrote its heading and tab bar
+    before the override loaded, leaving the page half-translated.
+19. **Popup renders were not serialised.** A burst of change events let two renders
+    interleave between clearing the root and writing, producing two `<select>` elements
+    sharing the id `ui-language`.
+20. **Two Playwright projects shared one browser profile.** Chromium profiles persist, so
+    the live-feeds job's data and settings leaked into the offline suite. This surfaced as
+    two flaky failures that were really isolation bugs.
+21. **A favicon probe could never work.** Chrome's `_favicon/` endpoint returns a valid PNG
+    with no `Content-Type` header, so `new Image()` fails to decode it. Referencing the URL
+    directly in CSS works. Found by testing rather than by reading documentation — the
+    `favicon` API page is not where one would look.
 
 ---
 
-## 5. The finding that mattered: statistics built on a development-only API
+## 5a. The fault that mattered: the extension blocked nothing
+
+### How it was found
+
+The user installed 1.1.0, visited phishing and malware sites, and saw no detection. The
+first instinct is to blame the lists or the heuristics. Measuring instead of guessing
+gave a different answer: on a fresh install, **0 dynamic rules**.
+
+Every one of the 336 tests passed. All of them seeded threats directly into
+`chrome.storage`, which is correct for testing behaviour and completely bypasses the feed
+pipeline — the pipeline that was broken.
+
+### The chain of causes
+
+Four independent defects, each of which alone was fatal:
+
+**1. The dataset exceeded the storage ceiling.**
+Measured against the real feeds on 2026-10-15:
+
+| Provider | Entries | Packed size |
+|---|---|---|
+| phishing-database-domains | 386,093 | 20.83 MiB |
+| stevenblack-hosts | 73,278 | 2.90 MiB |
+| easylist | 50,327 | 1.84 MiB |
+| easyprivacy | 47,235 | 1.91 MiB |
+| **total** | | **27.47 MiB** |
+
+`chrome.storage.local` allows 10 MB without `unlimitedStorage`. The updater refused
+every download, and on a fresh install there is no previous dataset to preserve, so
+nothing was written at all.
+
+**2. Two separate dataset caps, both below the real size** — 6 MiB in `updateFeeds` and
+9 MiB in `persistDataset`. Both were guesses, and both failed closed.
+
+**3. The phishing link feed pointed at a file the publisher serves empty.**
+`phishing-links-ACTIVE-today.txt` returns HTTP 200 with **0 bytes** (verified). The
+populated file is `phishing-links-ACTIVE.txt` at 65.8 MB, which the 32 MiB download cap
+would then have rejected anyway.
+
+**4. The rule budget was counted per provider.** `ad` is contributed by two providers, so
+the category could install twice its documented 2,000 rules and consume quota the threat
+categories needed.
+
+### Why it failed silently
+
+Two suppression points turned a hard failure into a non-event:
+
+- `runUpdateCycle` ended in `catch {}`. A total failure produced no log, no history entry,
+  no state — and no error the user could see.
+- `ensureRules` returns quietly. A build that compiles nothing is indistinguishable from
+  a build with an empty dataset, so the popup rendered a normal "protection On" screen
+  with a rule count of zero.
+
+That is the part worth remembering. Neither defect was exotic; the combination is what
+made the extension *look* fine while protecting nothing.
+
+### What changed
+
+| | Before | After |
+|---|---|---|
+| Storage | 10 MB ceiling | `unlimitedStorage` |
+| Dataset caps | 6 MiB / 9 MiB | one documented 64 MiB ceiling |
+| Download cap | 32 MiB | 128 MiB |
+| Link feed URL | empty file | populated file |
+| Budget | per provider | shared per category |
+| Host selection | first N alphabetically | even stride across the list |
+| Failure handling | `catch {}` | recorded, surfaced, deletable |
+
+### The rule-budget bug, in detail
+
+Worth stating precisely because it produced a rule set that *looked* like work.
+
+Feeds arrive sorted ASCII, and the per-category loop took hosts in that order until the
+budget ran out. The first 2,000 ad hosts in sorted order are all domains beginning with
+`0` and `a`. The installed rules were literally:
+
+```
+||0.0.0.0.creative.hpyrdr.com^
+||0.0.0.0.hpyrdr.com^
+||0.athwartwhoafat.com^
+...
+```
+
+Real rules, correct syntax, thousands of them, blocking nothing anyone visits. An
+even-stride sample across the sorted list produces a genuine spread — the same install now
+covers 11+ starting letters per category.
+
+### Why truncation was rejected as a fix
+
+Keeping the dataset small enough to fit an arbitrary byte budget was considered and
+rejected. The feeds are sorted ASCII, so the retained subset would have been every domain
+beginning with a few letters — a biased sample presented as complete. Silently dropping
+known phishing domains is the exact failure mode this project criticises elsewhere, so
+storage was raised instead.
+
+### Regression coverage
+
+`tests/e2e/feeds.spec.ts` is a new Playwright project that hits the network, because the
+offline suite was structurally incapable of catching this. It asserts:
+
+- the cycle completes without throwing and writes a dataset;
+- every credential-free provider is `active` with >1,000 entries;
+- >1,000 rules are installed after a fresh install;
+- threats outweigh privacy categories in the budget;
+- no category exceeds its documented cap;
+- rules are spread across the alphabet, with <5% `0.0.0.0` filler;
+- no regex rules, >90% host-anchored;
+- a real installed rule actually stops the browser;
+- the popup never claims protection while zero rules are installed.
+
+CI runs it as a separate job. Both projects now use distinct browser profiles — sharing one
+leaked feed data and settings between them and produced two flaky failures that were
+actually isolation bugs.
+
+---
+
+## 5. The finding that mattered before it: statistics built on a development-only API
 
 ### What was wrong
 
@@ -242,7 +433,21 @@ used to build a profile, and is disclosed rather than implied away.
 
 ## 7. Honest limitations
 
-Stated in the product itself, in `store/LIMITATIONS.md`:
+Stated in the product itself, in `store/LIMITATIONS.md`.
+
+**On ad blocking, measured rather than asserted.** Against the live EasyList and
+EasyPrivacy: ~97,000 network rules compile against a 27,000-rule quota, so roughly 70% of
+what those lists contain is not enforced. YouTube specifically is blocked only partially,
+because the bulk of EasyList's YouTube rules are *cosmetic* — `##.video-ads`,
+`###ytd-ad-slot-renderer` — and hiding elements is not something `declarativeNetRequest`
+can express. The 2,500 ad rules that are installed do block the ad *networks* (DoubleClick,
+AdNxs, Criteo, Taboola and similar), so scripts and images from those hosts are blocked,
+but ad slots inside YouTube's own page will still render. Adding cosmetic filtering would
+require `web_accessible_resources` to serve injected CSS, which trades away a deliberate
+security property. That trade-off is a decision for the product owner, not a detail.
+
+What was verified working: a rule compiled from a real feed entry stops the browser
+before DNS is consulted, and no site is falsely blocked in the offline suite.
 
 - Cannot detect every malicious site; feeds only cover reported URLs.
 - Cannot predict server-side redirects.

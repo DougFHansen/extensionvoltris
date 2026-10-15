@@ -17,6 +17,8 @@ export const K = {
   blockEvents: `${PREFIX}blockEvents`,
   feedState: `${PREFIX}feedState`,
   feedDataset: `${PREFIX}feedDataset`,
+  /** Reason the last update cycle failed; cleared with threat data. */
+  feedCycleError: `${PREFIX}feedCycleError`,
   rulesMeta: `${PREFIX}rulesMeta`,
   uiPrefs: `${PREFIX}uiPrefs`,
 } as const;
@@ -119,6 +121,11 @@ export async function clearData(scope: ClearScope): Promise<string[]> {
     // Derived state: rebuilt from the dataset, never authoritative.
     if (key === K.rulesMeta) return scope.threatData;
     if (key === K.feedDataset || key.startsWith('vbs.threats.') || key === K.feedState) return scope.threatData;
+    // The recorded reason the last update cycle failed. It describes threat
+    // data, so it belongs with threat data: leaving it behind would survive a
+    // "delete everything" and show a stale error about lists the user just
+    // erased.
+    if (key === K.feedCycleError) return scope.threatData;
     return false;
   };
 

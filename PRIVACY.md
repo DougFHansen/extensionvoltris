@@ -157,6 +157,8 @@ Settings → About and privacy provides:
 | `downloads` | Warn about suspicious downloads. |
 | `notifications` | Show download and update notifications. |
 | `scripting` | Re-run the page analysis when you ask for it. |
+| `favicon` | Show the current site's own icon, from the browser's cached copy. No request leaves the browser. |
+| `unlimitedStorage` | Remove the 10 MB storage ceiling. The threat lists measure about 27 MB compressed as domain names; without this the extension cannot store them and would block nothing. It grants **no** access to your data — it only removes a size limit. |
 | `<all_urls>` | Evaluate URLs and block requests. URLs stay on your device. |
 
 No other permission is requested. The list is verified automatically by

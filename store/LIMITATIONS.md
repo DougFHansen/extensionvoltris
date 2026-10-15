@@ -11,6 +11,41 @@ is simulated, stubbed or "coming soon in this build".
 - **The extension cannot detect every malicious site.** Threat feeds only contain URLs
   that have already been reported by someone. A site that has never been reported is
   invisible to a reputation engine, by definition.
+
+### Ad and tracker blocking is partial — measured, not estimated
+
+Chrome caps an extension at **30,000 declarative network rules**, of which we can use
+27,000. Measured against the live lists:
+
+| Data | Available | Installable | Coverage |
+|---|---|---|---|
+| Phishing.Database active domains | 386,074 | 13,000 | **3.4%** |
+| EasyList network rules (ads) | 50,327 | 2,500 | **5.0%** |
+| EasyPrivacy network rules | 47,235 | 3,500 | 7.4% |
+
+**A 5% sample cannot contain any particular ad network.** Every major ad host
+(`static.doubleclick.net`, `pagead2.googlesyndication.com`, `taboola.com`, `adnxs.com`)
+is listed in EasyList and none of them is installed. This is arithmetic, not a bug: no
+sampling strategy produces useful ad blocking at 5% coverage.
+
+- **YouTube ads are therefore not blocked.** Most of EasyList's YouTube rules are
+  *cosmetic* filters (`##.video-ads`, `###ytd-ad-slot-renderer`) that hide elements inside
+  the page. `declarativeNetRequest` cannot hide page elements, and Chrome's
+  `declarativeContent` API offers only `showAction` and `setIcon` — no CSS injection. There
+  is no MV3-native way to do cosmetic filtering.
+- **The only route is serving injected CSS**, which requires declaring
+  `web_accessible_resources`. This project deliberately has none. That trade-off has not
+  been taken; it is a product decision.
+- **A curated priority list of major ad networks** would fit in the budget (a few hundred
+  domains) and would block the big networks. It has not been added because it means
+  hand-maintaining a list that could drift out of date, and a wrong entry breaks a site
+  for the user.
+- **Blocking is verified, not assumed.** The end-to-end suite downloads the real feeds,
+  reads the installed rule set back out of the browser, confirms a rule compiled from a
+  real feed entry stops a navigation, and asserts the retained rules span the whole
+  alphabet. That last check exists because an earlier build sampled the lists and *then*
+  took a sorted prefix, which cancelled itself out and left thousands of rules covering
+  only domains beginning with `0` and `a`.
 - **Freshly registered domains and zero-days are not covered.** This is the expected
   behaviour of every feed-based blocker. The heuristic engine raises the probability of
   catching new campaigns; it does not eliminate the gap.

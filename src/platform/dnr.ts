@@ -104,7 +104,12 @@ export async function swapDynamicRules(next: readonly CompiledRule[]): Promise<S
         continue;
       }
       seen.add(rule.id);
-      addRules.push(rule as chrome.declarativeNetRequest.Rule);
+      // `providerId` is our own provenance marker, not a DNR field. It must be
+      // stripped here: passing an unknown key makes the browser reject the rule,
+      // and the whole atomic swap with it.
+      const { providerId: _provenance, ...installable } = rule;
+      void _provenance;
+      addRules.push(installable as chrome.declarativeNetRequest.Rule);
     }
 
     await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds, addRules });

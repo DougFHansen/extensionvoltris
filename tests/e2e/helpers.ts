@@ -123,9 +123,22 @@ export class ExtensionHandle {
   }
 }
 
-export async function launchWithExtension(options: { lang?: string } = {}): Promise<ExtensionHandle> {
+export async function launchWithExtension(options: { lang?: string; profile?: string } = {}): Promise<ExtensionHandle> {
   const lang = options.lang ?? 'en-US';
-  const userDataDir = join(process.env.TEMP ?? '.', `vbs-e2e-${process.pid}-${lang}`);
+  /*
+   * The profile directory MUST vary per project.
+   *
+   * Chromium profiles are persistent by design, so two projects sharing a
+   * directory also share `chrome.storage`. The live-feeds project installs the
+   * real threat lists and writes `uiLanguage` settings; the offline suite then
+   * inherited both and asserted against state it had never set. It surfaced as a
+   * flaky language assertion and a "local data" test that only failed when the
+   * projects ran together.
+   *
+   * `profile` is part of the name so each project is genuinely isolated.
+   */
+  const profile = options.profile ?? 'default';
+  const userDataDir = join(process.env.TEMP ?? '.', `vbs-e2e-${profile}-${process.pid}-${lang}`);
   const context = await chromium.launchPersistentContext(userDataDir, {
     channel: 'chromium',
     headless: true,

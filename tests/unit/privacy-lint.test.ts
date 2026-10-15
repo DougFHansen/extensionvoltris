@@ -112,6 +112,14 @@ describe('extension-wide security contract', () => {
       // explained. Available to published extensions, no install-time warning,
       // and we never persist or transmit the events.
       'webNavigation',
+      // Lets the popup show the current site's own icon from the browser's favicon
+      // cache. No network request leaves the browser, and the permission carries
+      // no install-time warning.
+      'favicon',
+      // Removes the 10 MB storage.local ceiling. The threat dataset measures
+      // ~27 MiB, so without it the extension cannot store threat data. It grants
+      // no access to user data and is invisible at install time.
+      'unlimitedStorage',
       'downloads',
       'notifications',
       'scripting',
@@ -141,6 +149,27 @@ describe('extension-wide security contract', () => {
     // driven by `onRuleMatchedDebug`.
     const offenders = grepFiles('src', /onRuleMatchedDebug|getMatchedRules|declarativeNetRequestFeedback/);
     expect(offenders).toEqual([]);
+  });
+
+  it('can actually store the threat data the real feeds produce', () => {
+    /*
+     * THE FAULT THIS EXISTS TO CATCH
+     * ------------------------------
+     * The packed dataset measured ~27 MiB against the real feeds, while
+     * `storage.local` allows 10 MB without `unlimitedStorage`. The updater
+     * therefore refused every download on a fresh install, no rules were built,
+     * and the extension reported success while blocking nothing. Every other
+     * test missed it because they seed threats directly into storage.
+     *
+     * `tests/e2e/feeds.spec.ts` proves the whole pipeline against the live
+     * feeds. This test keeps the permission that makes it possible, so the
+     * storage ceiling cannot be silently reinstated without failing here.
+     */
+    const manifest = JSON.parse(readFileSync('src/manifest.json', 'utf8')) as { permissions: string[] };
+    expect(
+      manifest.permissions,
+      'the real threat dataset does not fit in storage.local without unlimitedStorage',
+    ).toContain('unlimitedStorage');
   });
 
   it('never requests high-risk permissions', () => {

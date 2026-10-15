@@ -264,8 +264,109 @@ describe('buildRules - category gating and priority', () => {
     ];
     const result = buildRules({ settings: { ...DEFAULT_SETTINGS, blockAds: true }, datasets: many, allowlist: [] });
     expect(result.truncatedCategories).toContain('ad');
-    expect(result.installedByCategory.ad).toBe(2_000); // documented per-category cap
-    expect(result.droppedForQuota).toBe(3_000);
+    expect(result.installedByCategory.ad).toBe(2_500); // documented per-category cap
+    expect(result.droppedForQuota).toBe(2_500);
+  });
+
+  it('shares one budget across every provider feeding a category', () => {
+    // Regression: `ad` and `malware` each come from two providers (EasyList
+    // plus StevenBlack). Counting the cap per provider let `ad` install twice
+    // its documented budget, quietly consuming quota the threat categories
+    // needed.
+    //
+    // `owner` is how a merged dataset reports per-host provenance; without it
+    // the rules carry no attribution.
+    const hostOf = (i: number, tag: string) => `host${i.toString().padStart(4, '0')}${tag}.test`;
+    const a = new Set(Array.from({ length: 3_000 }, (_, i) => hostOf(i, 'a')));
+    const b = new Set(Array.from({ length: 3_000 }, (_, i) => hostOf(i, 'b')));
+    const owner = new Map<string, string>();
+    for (const h of a) owner.set(h, 'easylist');
+    for (const h of b) owner.set(h, 'stevenblack-hosts');
+
+    const result = buildRules({
+      settings: { ...DEFAULT_SETTINGS, blockAds: true },
+      datasets: [{ category: 'ad', hosts: new Set([...a, ...b]), owner, order: 5 }],
+      allowlist: [],
+    });
+
+    // The shared cap, not twice it.
+    expect(result.installedByCategory.ad).toBe(2_500);
+    expect(result.quota.perCategory.ad).toBe(2_500);
+    expect(result.rules.length).toBe(2_500);
+
+    // Both providers contributed: the merged set is sampled, not one provider's
+    // prefix.
+    expect(new Set(result.rules.map((r) => r.providerId))).toEqual(new Set(['easylist', 'stevenblack-hosts']));
+  });
+
+  it('attributes each rule to the provider that actually listed the host', () => {
+    const owner = new Map([
+      ['from-easylist.test', 'easylist'],
+      ['from-stevenblack.test', 'stevenblack-hosts'],
+    ]);
+    const result = buildRules({
+      settings: { ...DEFAULT_SETTINGS, blockAds: true },
+      datasets: [{ category: 'ad', hosts: new Set(owner.keys()), owner, order: 5 }],
+      allowlist: [],
+    });
+    const attribution = new Map(result.rules.map((r) => [r.condition.urlFilter, r.providerId]));
+
+    expect(attribution.get('||from-easylist.test^')).toBe('easylist');
+    expect(attribution.get('||from-stevenblack.test^')).toBe('stevenblack-hosts');
+  });
+
+  it('retains hosts from the whole alphabet, not just an early prefix', () => {
+    /*
+     * Regression. Two selection steps - an even stride in the assembler followed
+     * by a prefix slice in the compiler - cancelled each other out and collapsed
+     * the installed rules back onto the first few letters. Real ad networks
+     * listed in EasyList (`static.doubleclick.net`, `pagead2.googlesyndication.com`)
+     * sort far past that prefix and were silently never installed.
+     */
+    const hosts = new Set<string>();
+    // A wide alphabet: two letters per "region", 400 hosts each = 20,800 total.
+    for (let region = 0; region < 26; region += 1) {
+      const prefix = String.fromCharCode(97 + (region % 26));
+      const second = String.fromCharCode(97 + Math.floor(region / 26));
+      for (let i = 0; i < 400; i += 1) hosts.add(`${prefix}${second}${i.toString().padStart(4, '0')}.test`);
+    }
+
+    const result = buildRules({
+      settings: { ...DEFAULT_SETTINGS, blockAds: true },
+      datasets: [{ category: 'ad', hosts, order: 5 }],
+      allowlist: [],
+    });
+
+    const installed = result.rules.map((r) => (r.condition.urlFilter ?? '').replace(/^\|\|/, ''));
+    const firstLetters = new Set(installed.map((h) => h[0]));
+    expect(firstLetters.size, 'the sample collapsed onto too few starting letters').toBeGreaterThanOrEqual(20);
+
+    /*
+     * Coverage must reach the END of the alphabet too. An even stride does not
+     * guarantee the literal last element (the step lands between indices), so the
+     * assertion is on the final REGION, which is what "not an early prefix"
+     * actually means.
+     */
+    const finalRegion = installed.filter((h) => h.startsWith('za')).length;
+    expect(finalRegion, 'nothing from the end of the alphabet was retained').toBeGreaterThan(0);
+    expect(finalRegion, 'the sample is heavily skewed toward the start').toBeGreaterThan(10);
+  });
+
+  it('does not let one over-supplied category starve the threat categories', () => {
+    // A flood of ad and tracker hosts must not consume the quota phishing needs.
+    const flood = [
+      { category: 'ad' as const, hosts: new Set(Array.from({ length: 50_000 }, (_, i) => `ad${i}.test`)), providerId: 'p1', order: 5 },
+      { category: 'tracker' as const, hosts: new Set(Array.from({ length: 50_000 }, (_, i) => `tr${i}.test`)), providerId: 'p2', order: 4 },
+      { category: 'phishing' as const, hosts: new Set(Array.from({ length: 20_000 }, (_, i) => `ph${i}.test`)), providerId: 'p3', order: 2 },
+    ];
+    const result = buildRules({
+      settings: { ...DEFAULT_SETTINGS, blockAds: true, blockTrackers: true, blockPhishing: true },
+      datasets: flood,
+      allowlist: [],
+    });
+
+    expect(result.installedByCategory.phishing).toBe(13_000);
+    expect(result.rules.length).toBeLessThanOrEqual(result.quota.datasetBudget);
   });
 });
 

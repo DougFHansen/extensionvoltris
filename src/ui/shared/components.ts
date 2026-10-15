@@ -290,6 +290,65 @@ export function displayUrl(url: string | null | undefined): string {
   }
 }
 
+/**
+ * The browser's cached favicon for a page.
+ *
+ * Uses the `favicon` permission and the `_favicon/` endpoint Chrome exposes to
+ * extensions. The browser fetches and caches the icon itself, so this neither
+ * contacts the site from the extension nor reveals the page to anyone: no
+ * network request originates here, and the URL is only handed to the browser
+ * that already has the tab open.
+ *
+ * Returns null when the page has no usable URL, in which case the caller falls
+ * back to a neutral placeholder rather than showing a broken image.
+ *
+ * Only http and https are accepted. A `chrome://` or `file://` URL is never
+ * passed to the endpoint, which would be pointless and would hand the browser a
+ * privileged scheme it has no reason to resolve.
+ */
+export function faviconUrl(pageUrl: string | null | undefined, size = 32): string | null {
+  if (!pageUrl) return null;
+  try {
+    const parsed = new URL(pageUrl);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
+    const id = chrome.runtime.id;
+    return `chrome-extension://${id}/_favicon/?pageUrl=${encodeURIComponent(parsed.href)}&size=${size}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Applies a favicon as a CSS background image.
+ *
+ * The image is referenced straight into `background-image` rather than being
+ * probed with `new Image()` first. That probe looks like the obvious approach and
+ * does not work here: Chrome's `_favicon/` endpoint answers 200 with a valid PNG
+ * but sends **no `Content-Type` header**, so the image decoder has nothing to
+ * choose a format from and fires `error`. The CSS path resolves the same URL
+ * correctly and needs no extra work.
+ *
+ * No error handling is required. When a site has no icon Chrome serves its own
+ * neutral globe through this same endpoint, which is what the user would see in
+ * the tab anyway. A genuinely broken request degrades to the placeholder rule
+ * in the stylesheet rather than to a torn image, because the placeholder is the
+ * element's default background.
+ *
+ * No network request originates here: the browser serves from its own favicon
+ * cache, which it already populated for the open tab.
+ */
+export function applyFavicon(node: HTMLElement, pageUrl: string | null | undefined): void {
+  const url = faviconUrl(pageUrl);
+  if (!url) {
+    node.dataset.favicon = 'unavailable';
+    return;
+  }
+  node.dataset.favicon = 'ready';
+  // The URL is built by `faviconUrl` from a parsed URL and encoded, so it
+  // cannot break out of the CSS url() token.
+  node.style.backgroundImage = `url("${url}")`;
+}
+
 // ---------------------------------------------------------------- theming
 
 export function applyTheme(theme: 'system' | 'light' | 'dark', reducedMotion = false): void {

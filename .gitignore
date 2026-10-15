@@ -25,7 +25,15 @@ npm-debug.log*
 # Local scratch
 *.tmp.json
 probe.mjs
+probe-*.mjs
 e2e-output.txt
+
+# Screenshots and captures from manual testing, at the project root only.
+# They are evidence of a session, not source, and one contained browser UI
+# details that should not be published. The extension icons live under
+# src/assets/icons and are deliberately NOT matched by this rule.
+/Sem *.png
+/*.png
 
 # ---------------------------------------------------------------------------
 # NEVER COMMIT SECRETS

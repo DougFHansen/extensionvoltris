@@ -25,7 +25,24 @@ function skip(counters: MutableCounters, reason: string): void {
 type MutableCounters = { accepted: number; skipped: number; skippedByReason: Record<string, number>; duplicates: number };
 
 /** Maximum bytes we will read from a remote feed. */
-export const MAX_FEED_BYTES = 32 * 1024 * 1024;
+/**
+ * Ceiling on a single feed download.
+ *
+ * Measured against the real feeds on 2026-10-15:
+ *   phishing-domains-ACTIVE.txt   10.5 MiB
+ *   phishing-links-ACTIVE.txt     65.8 MiB   <- was refused at 32 MiB
+ *   StevenBlack hosts              2.2 MiB
+ *   easylist                       2.1 MiB
+ *   easyprivacy                    1.5 MiB
+ *
+ * The 32 MiB ceiling rejected the link feed on every run. It is the same class
+ * of fault as the dataset ceiling: a limit set from a guess rather than from
+ * measurement, failing closed and silently.
+ *
+ * 128 MiB still bounds the damage from a hostile or malfunctioning endpoint -
+ * the real worst case is well under a quarter of it.
+ */
+export const MAX_FEED_BYTES = 128 * 1024 * 1024;
 /** Maximum individual line length accepted. */
 const MAX_LINE_LENGTH = 4096;
 
@@ -352,6 +369,20 @@ export function parseAdblock(input: string): ParsedAdblock {
     rules.push(rule);
     counters.accepted += 1;
   }
+
+  /*
+   * ORDER BY HOST, so the downstream budget can sample across the whole list.
+   *
+   * The feeds arrive sorted ASCII. Preserving that order downstream meant the
+   * rule budget was spent on whichever hosts came first alphabetically, which
+   * in practice was a block of `0.0.0.0.*` entries - real rules, useless for
+   * blocking anything a user visits. Sorting by host makes an even stride a
+   * genuine sample of the list.
+   *
+   * A stable comparison on the host only: rules for the same host with
+   * different options must keep their relative order, and V8's sort is stable.
+   */
+  rules.sort((a, b) => (a.host < b.host ? -1 : a.host > b.host ? 1 : 0));
 
   return { rules, counters, headerVersion };
 }

@@ -25,6 +25,14 @@ const ALLOWED_PERMISSIONS = new Set([
   'downloads',
   'notifications',
   'scripting',
+  // Displays the current site's icon from the browser's own favicon cache.
+  // No request leaves the browser; no install-time warning.
+  'favicon',
+  // Lifts the 10 MB storage.local quota. The packed threat dataset measures
+  // ~27 MiB against the real feeds, so without this the extension cannot store
+  // the threat data at all. The permission grants no access to anything the user
+  // holds; it only removes a size ceiling, and Chrome shows no install warning.
+  'unlimitedStorage',
   'activeTab',
 ]);
 

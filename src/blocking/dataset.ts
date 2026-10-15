@@ -31,6 +31,19 @@ const ORDER_BY_CATEGORY: Record<ThreatCategory, number> = {
 /** Providers that contribute reputation data (not just network blocking). */
 const REPUTATION_PROVIDERS = new Set(['phishing-database-domains', 'phishing-database-links', 'stevenblack-hosts']);
 
+/**
+ * NO SELECTION BUDGET HERE, ON PURPOSE.
+ *
+ * This module used to pre-sample each category and let the controller take a
+ * prefix of that sample. A prefix of an even sample is still a prefix, so the
+ * two steps cancelled: the installed rules collapsed onto the first few letters
+ * of the alphabet, and real ad networks present in EasyList (`static.doubleclick.net`,
+ * `pagead2.googlesyndication.com`) were never installed.
+ *
+ * Budgeting now happens once, in `buildRules`. Two selection steps were one too
+ * many.
+ */
+
 function isUsableState(state: ProviderState): boolean {
   return state.status === 'active' || state.status === 'stale' || state.status === 'bundled_snapshot';
 }
@@ -91,9 +104,40 @@ export function assembleDatasets(dataset: Dataset): AssembleResult {
 
   const datasets: CategoryDataset[] = [];
   for (const [category, bucket] of byCategory) {
-    for (const [providerId, hosts] of bucket) {
-      datasets.push({ category, hosts, providerId, order: ORDER_BY_CATEGORY[category] });
+    /*
+     * MERGE ONLY. NO SELECTION HERE.
+     *
+     * This module used to sample the category down to a selection budget and
+     * hand the sample to the controller, which then took the first N of that
+     * sample in sorted order. The two steps cancelled each other out: an even
+     * stride followed by a prefix slice is still a prefix slice, and the
+     * installed rules collapsed back onto the first few letters of the alphabet.
+     *
+     * That is exactly how `||static.doubleclick.net^` and
+     * `||pagead2.googlesyndication.com^` - both present in EasyList, both ad
+     * networks seen on a real page - ended up uninstalled. They sort under `p`
+     * and `s`, past the prefix the slice reached.
+     *
+     * Budgeting now happens once, in `buildRules`, as a single even-stride
+     * selection. One operation, one place, and it cannot be undone downstream.
+     */
+    const merged = new Set<string>();
+    for (const [, hosts] of bucket) {
+      // Explicit loop, not a spread: the real feeds hold hundreds of thousands
+      // of hosts and `push(...hosts)` overflows the call stack.
+      for (const host of hosts) merged.add(host);
     }
+    if (merged.size === 0) continue;
+
+    // One dataset per category, with each host attributed to the provider that
+    // listed it. Attribution is preserved for the block page and Diagnostics.
+    const owner = new Map<string, string>();
+    for (const [providerId, hosts] of bucket) {
+      for (const host of hosts) {
+        if (!owner.has(host)) owner.set(host, providerId);
+      }
+    }
+    datasets.push({ category, hosts: merged, owner, order: ORDER_BY_CATEGORY[category] });
   }
 
   return { datasets, reputationByProvider, usableProviders: usable, skippedProviders: skipped };

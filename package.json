@@ -20,6 +20,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:e2e:live": "playwright test --project=live-feeds",
     "audit:static": "node scripts/static-analysis.mjs",
     "audit:privacy": "node scripts/privacy-audit.mjs",
     "audit:secrets": "node scripts/scan-secrets.mjs",

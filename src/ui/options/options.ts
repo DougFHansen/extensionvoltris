@@ -415,8 +415,38 @@ async function renderUpdates(): Promise<Child[]> {
 
   const states = response.ok ? response.data.states : [];
   const configured = new Set(response.ok ? response.data.configured : []);
+  const cycleError = response.ok ? (response.data as { cycleError?: { message: string } | null }).cycleError : null;
+
+  /*
+   * "NO THREAT DATA" IS THE MOST IMPORTANT THING ON THIS TAB.
+   *
+   * The updater refused the real feeds for as long as this shipped, so the
+   * provider table was legitimately empty and the tab rendered "no provider",
+   * which reads like nothing to worry about. Nothing anywhere said the extension
+   * was blocking nothing.
+   *
+   * An empty list is therefore treated as a fault, not an empty state: the panel
+   * below leads with the fact that protection is not active.
+   */
+  const noThreatData = states.filter((s) => s.status === 'active' || s.status === 'stale').length === 0;
 
   return [
+    ...(noThreatData
+      ? [
+          card({ title: t('lists_no_data_title') }, [
+            el('p', { text: t('lists_no_data_body') }),
+            cycleError ? el('p', { class: 'small mono', text: cycleError.message }) : null,
+            button({
+              label: t('lists_update_now'),
+              variant: 'primary',
+              onClick: async () => {
+                await request('feeds.refresh', {});
+                await renderActiveTab();
+              },
+            }),
+          ]),
+        ]
+      : []),
     card(
       {
         title: t('lists_title'),

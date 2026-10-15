@@ -41,7 +41,11 @@ export const FEED_REGISTRY: readonly ProviderDescriptor[] = [
     id: 'phishing-database-links',
     name: 'Phishing.Database (active links)',
     homepage: 'https://github.com/Phishing-Database/Phishing.Database',
-    feedUrl: 'https://raw.githubusercontent.com/Phishing-Database/Phishing.Database/master/phishing-links-ACTIVE-today.txt',
+    // The upstream file `phishing-links-ACTIVE-today.txt` exists but is served
+    // EMPTY (verified 2026-10-15: HTTP 200, 0 bytes), which made this provider
+    // fail with "too_few_entries" on every run. The stable `phishing-links-ACTIVE.txt`
+    // is the populated file. Verified non-empty: HTTP 200, ~65.8 MB.
+    feedUrl: 'https://raw.githubusercontent.com/Phishing-Database/Phishing.Database/master/phishing-links-ACTIVE.txt',
     format: 'domain-list',
     license: {
       id: 'MIT',
@@ -56,7 +60,7 @@ export const FEED_REGISTRY: readonly ProviderDescriptor[] = [
     excludedFromProduct: false,
     dataVersion: 'daily',
     notes:
-      'Full phishing URLs. We only extract the host portion; paths are never stored, which keeps the dataset small and avoids storing browsing-relevant detail.',
+      'Full phishing URLs. We only extract the host portion; paths are never stored, which keeps the dataset small and avoids storing browsing-relevant detail. The source file is ~65 MB of URLs but parses to hostnames only, so its share of the dataset is a few MiB.',
   },
 
   // ----------------------------------------------------------------- malware

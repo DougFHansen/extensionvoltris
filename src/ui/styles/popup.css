@@ -171,7 +171,20 @@ body.popup {
   height: 18px;
   border-radius: 4px;
   flex-shrink: 0;
-  background: var(--vbs-surface-3);
+  background-color: var(--vbs-surface-3);
+  /* Chromium's favicon cache is often a multi-resolution ICO; scaling keeps the
+     16px slot crisp instead of letting the browser pick a 32px frame. */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Placeholder when the site has no usable URL. The stylesheet's default
+   background already covers a failed icon request, so only the "no page" case
+   needs an explicit marker. */
+.site-favicon[data-favicon='unavailable'] {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%236b7280' d='M8 1a7 7 0 100 14A7 7 0 008 1zm0 1.5c.9 0 1.9 1.6 2.3 4.1H5.7C6.1 4.1 7.1 2.5 8 2.5zM5.7 9.1h4.6c-.4 2.5-1.4 4.1-2.3 4.1S6.1 11.6 5.7 9.1zM3.9 9.1H3a5.5 5.5 0 011.9-4v5c-.4.5-.8 1-1.2 1.6-.5-.7-1-1.4-1.2-2.1H3.9zm8.2 0h.8c-.2.7-.7 1.4-1.2 2.1-.4-.6-.8-1.1-1.2-1.6v-5a5.5 5.5 0 011.9 4z'/%3E%3C/svg%3E");
+  background-size: 14px 14px;
 }
 
 .site-hostname {

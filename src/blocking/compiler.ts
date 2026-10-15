@@ -25,6 +25,14 @@ export interface CompiledRule {
   priority: number;
   action: chrome.declarativeNetRequest.RuleAction;
   condition: chrome.declarativeNetRequest.RuleCondition;
+  /**
+   * Which feed listed this host.
+   *
+   * Carried on the object rather than only in `CompileInput` so diagnostics can
+   * report per-provider attribution. It is NOT written into the DNR rule: the
+   * browser has no field for it, and inventing one would break the install.
+   */
+  providerId?: string;
 }
 
 export interface CompileInput {
@@ -156,7 +164,15 @@ export function compileRule(input: CompileInput, id: number): CompiledRule | nul
   const priority =
     input.priority ?? (input.mainFrameOnly ? RULE_PRIORITY.REDIRECT_NAV : PRIORITY_BY_CATEGORY[input.category]);
 
-  return { id, priority, action: { type: 'block' as ActionTypeName }, condition };
+  return {
+    id,
+    priority,
+    action: { type: 'block' as ActionTypeName },
+    condition,
+    // Kept off `condition` on purpose: the browser has no provenance field, and
+    // writing an unknown key would make the rule reject at install time.
+    ...(input.providerId ? { providerId: input.providerId } : {}),
+  };
 }
 
 /**

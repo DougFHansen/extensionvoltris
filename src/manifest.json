@@ -41,7 +41,9 @@
     "webNavigation",
     "downloads",
     "notifications",
-    "scripting"
+    "scripting",
+    "favicon",
+    "unlimitedStorage"
   ],
 
   "host_permissions": ["<all_urls>"],

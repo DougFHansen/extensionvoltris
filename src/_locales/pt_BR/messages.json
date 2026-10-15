@@ -596,6 +596,14 @@
   "lists_license": {
     "message": "Licença"
   },
+  "lists_no_data_body": {
+    "message": "Nenhuma lista de ameaças pôde ser baixada, então nada está sendo bloqueado agora. Verifique sua conexão e tente novamente.",
+    "description": "Declara claramente que a proteção está inativa em vez de sugerir uma instalação funcionando."
+  },
+  "lists_no_data_title": {
+    "message": "Sem dados de ameaças - a proteção não está ativa",
+    "description": "Exibido em Configurações > Atualizações quando nenhum provedor carregou. É uma falha, não um estado vazio."
+  },
   "lists_no_provider": {
     "message": "Nenhum dado de provedor ainda"
   },
@@ -872,6 +880,18 @@
   },
   "popup_no_site_hint": {
     "message": "Abra uma página para analisá-la."
+  },
+  "popup_not_protected_action": {
+    "message": "Baixar as listas agora",
+    "description": "Dispara uma atualização imediata das listas a partir do painel de aviso."
+  },
+  "popup_not_protected_body": {
+    "message": "As listas de ameaças ainda não foram baixadas, então nada está sendo bloqueado. Verifique sua conexão com a internet.",
+    "description": "Explica por que a contagem de regras é zero, em vez de sugerir que a extensão funciona."
+  },
+  "popup_not_protected_title": {
+    "message": "A proteção não está ativa",
+    "description": "Exibido quando a proteção está ligada mas nenhuma regra foi instalada. Nunca deve ser ocultado."
   },
   "popup_open_dashboard": {
     "message": "Abrir painel"

@@ -160,16 +160,31 @@ describe('updateFeeds atomicity and downgrade protection', () => {
     }) as unknown as typeof fetch;
   }
 
-  /** All four bundled providers succeed. */
+  /**
+   * Every credential-free provider succeeds.
+   *
+   * The link feed is keyed on `phishing-links-ACTIVE`, NOT `...-ACTIVE-today`:
+   * the upstream `-today` file exists but is served EMPTY (verified 2026-10-15,
+   * HTTP 200 with 0 bytes), which made this provider fail on every real run.
+   * The fixture matches the URL the registry actually requests.
+   */
   function allGoodFetch(): typeof fetch {
     return fakeFetch({
       'phishing-domains-ACTIVE': goodPhishing,
-      'phishing-links-ACTIVE-today': goodPhishingLinks,
+      'phishing-links-ACTIVE': goodPhishingLinks,
       'StevenBlack/hosts': goodBlack,
       'easylist': '||ads.test^\n',
       'easyprivacy': '||tracker.test^\n',
     });
   }
+
+  it('never requests the empty upstream link file', () => {
+    // Guards the regression directly: if the registry points at the file the
+    // publisher leaves empty, every install loses this provider silently.
+    const linkProvider = FEED_REGISTRY.find((p) => p.id === 'phishing-database-links');
+    expect(linkProvider, 'link provider missing from the registry').toBeTruthy();
+    expect(linkProvider!.feedUrl).not.toContain('ACTIVE-today');
+  });
 
   it('writes a new dataset and increments the revision', async () => {
     const outcome = await updateFeeds({ force: true, fetchImpl: allGoodFetch() });

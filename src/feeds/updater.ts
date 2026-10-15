@@ -46,8 +46,16 @@ export interface Dataset {
 
 export const DATASET_SCHEMA_VERSION = 1;
 
-/** Hard ceiling for the whole dataset, well below the storage quota. */
-const DATASET_MAX_BYTES = 6 * 1024 * 1024;
+/**
+ * Hard ceiling for the whole dataset.
+ *
+ * This was a local 6 MiB constant, below the 9 MiB gate in `persistDataset` and
+ * far below the ~27 MiB the real feeds actually produce. It refused every
+ * download and left the extension with no threat data at all. See the
+ * `DATASET_MAX_BYTES` documentation in `core/constants.ts` for the measurements.
+ */
+import { DATASET_MAX_BYTES } from '../core/constants';
+
 /** Refuse absurd growth (tampered or truncated response). */
 const MAX_ENTRIES_PER_PROVIDER = 500_000;
 /** Minimum plausible entry count; below this the response is probably an error page. */
@@ -470,8 +478,15 @@ async function persistDataset(dataset: Dataset): Promise<void> {
     schemaVersion: DATASET_SCHEMA_VERSION,
   };
   for (const [id, packed] of dataset.domainsByProvider) payload[id] = packed;
+  // The guard is DATASET_MAX_BYTES, not the 10 MB storage quota. `storage.local`
+  // has a 10 MB default limit, but the `unlimitedStorage` permission lifts it,
+  // and without this the real dataset (~27 MiB) would be refused - which is
+  // exactly what shipped: no rules installed, so no protection, reported as a
+  // success.
   const projected = byteSizeOf(payload);
-  if (projected > STORAGE_SOFT_LIMIT_BYTES) throw new Error(`dataset would exceed storage soft limit (${projected})`);
+  if (projected > DATASET_MAX_BYTES) {
+    throw new Error(`dataset would exceed the ceiling (${projected} > ${DATASET_MAX_BYTES})`);
+  }
   await chrome.storage.local.set({ [K.feedDataset]: payload });
 }
 

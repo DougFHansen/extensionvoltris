@@ -32,6 +32,15 @@ export interface RulesMeta {
   readonly installedByCategory: Readonly<Record<string, number>>;
   readonly droppedForQuota: number;
   readonly truncatedCategories: readonly string[];
+  /**
+   * Why the last rebuild produced fewer rules than expected, if it did.
+   *
+   * `ensureRules` normally returns silently, so a build that fails to compile
+   * anything is indistinguishable from a build with an empty dataset. That is
+   * how an extension with zero protection could look healthy. Recorded here and
+   * surfaced in the popup.
+   */
+  readonly lastError: string | null;
 }
 
 export async function ensureRules(force = false): Promise<void> {
@@ -49,6 +58,12 @@ export async function ensureRules(force = false): Promise<void> {
       const installed = await refreshProtection(dataset, settings, allowlist);
       lastRebuildAt = Date.now();
 
+      // An empty rule set from a non-empty dataset is a fault, not a state. A
+      // genuinely empty dataset on a fresh install is normal until the first
+      // feed download completes, so only the former is recorded as an error.
+      const datasetHasData = dataset.states.some((s) => s.entryCount > 0);
+      const compiledNothing = installed.ruleCount === 0 && datasetHasData;
+
       const meta: RulesMeta = {
         revision: dataset.revision,
         installedAt: Date.now(),
@@ -57,6 +72,9 @@ export async function ensureRules(force = false): Promise<void> {
         installedByCategory: installed.build.installedByCategory,
         droppedForQuota: installed.build.droppedForQuota,
         truncatedCategories: installed.build.truncatedCategories,
+        lastError: compiledNothing
+          ? 'threat data present but no rules were compiled'
+          : installed.error ?? null,
       };
       await set(K.rulesMeta, meta);
       if (!installed.ok && installed.error) {

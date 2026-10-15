@@ -62,6 +62,82 @@ export function encodeDomains(domains: Iterable<string>): string {
   return out.sort().join(SEPARATOR);
 }
 
+/**
+ * Deterministic, alphabet-spanning selection.
+ *
+ * WHY THIS EXISTS
+ * ---------------
+ * Every provider has a per-category rule budget far smaller than its entry
+ * count: EasyList alone offers ~50,000 network hosts against a 2,000-rule ad
+ * budget. Something must be dropped, and the naive choice - take the first N of
+ * a sorted list - is actively harmful here.
+ *
+ * The feeds are sorted ASCII, so the first N entries are every domain beginning
+ * with a handful of letters. An ad blocker compiled that way does not block
+ * ads: `||0.0.0.0.creative.hpyrdr.com^` is exactly what got installed before this
+ * function existed. It looks like work is being done while coverage is close to
+ * useless.
+ *
+ * An even stride across the sorted list keeps every region of the alphabet, so
+ * the retained subset behaves like a uniform sample of the real list. The
+ * selection is stable: the same input always yields the same output, which
+ * matters because the user-visible "dropped for quota" counts must be
+ * reproducible.
+ *
+ * The stride is walked in sorted order, so this is O(n) and does not need the
+ * full list in memory beyond the caller's sorted iteration.
+ */
+export function selectEvenly<T>(items: readonly T[], count: number): T[] {
+  if (count <= 0) return [];
+  if (items.length <= count) return [...items];
+
+  const step = items.length / count;
+  const out: T[] = [];
+  const chosen = new Set<number>();
+  for (let i = 0; i < count; i += 1) {
+    // Rounding can repeat an index; skip rather than emit a duplicate host.
+    const index = Math.min(items.length - 1, Math.floor(i * step));
+    if (chosen.has(index)) continue;
+    chosen.add(index);
+    out.push(items[index]!);
+  }
+  return out;
+}
+
+/**
+ * Filters a merged category list down to an even sample, without building the
+ * merged array first.
+ *
+ * `assembleDatasets` needs the same selection as `selectEvenly`, but merging
+ * every provider's hosts with a spread blew the stack on the real data:
+ * `[...new Set(hosts)]` plus `merged.push(...hosts)` reached hundreds of
+ * thousands of arguments, and `RangeError: Maximum call stack size exceeded`
+ * took down the whole update cycle.
+ *
+ * Iterating one entry at a time keeps memory flat and cannot overflow the
+ * argument limit, whatever the feed size.
+ *
+ * The stride is computed over `sortedSize` (the count after de-duplication) and
+ * applied to the de-duplicated sequence, so the result matches `selectEvenly`
+ * on the same input while never materialising it as one array.
+ */
+export function selectEvenlyIterative(sorted: readonly string[], count: number): Set<string> {
+  const out = new Set<string>();
+  if (count <= 0 || sorted.length === 0) return out;
+
+  if (sorted.length <= count) {
+    for (const host of sorted) out.add(host);
+    return out;
+  }
+
+  const step = sorted.length / count;
+  for (let i = 0; i < count; i += 1) {
+    const index = Math.min(sorted.length - 1, Math.floor(i * step));
+    out.add(sorted[index]!);
+  }
+  return out;
+}
+
 export function decodeDomains(packed: string | undefined): Set<string> {
   const set = new Set<string>();
   if (!packed) return set;

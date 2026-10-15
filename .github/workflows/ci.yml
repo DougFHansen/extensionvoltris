@@ -81,3 +81,25 @@ jobs:
         # Proves the artifact that would be uploaded to the stores actually runs,
         # extracted by a reader we did not write.
         run: node scripts/verify-package.mjs
+
+  live-feeds:
+    name: Real threat feeds end to end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Download the real feeds and verify the rule set
+        # This job is the one that would have caught the shipping fault: the
+        # pipeline silently produced no dataset, so the extension ran with zero
+        # protection while every offline test passed. It needs the network.
+        run: npm run test:e2e:live

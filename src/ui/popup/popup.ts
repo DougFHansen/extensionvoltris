@@ -9,6 +9,7 @@ import { UI_LANGUAGES } from '../../core/types';
 import type { StatusResponse } from '../../background/messages';
 import { request } from '../../platform/messages';
 import {
+  applyFavicon,
   applyTheme,
   append,
   badge,
@@ -196,9 +197,47 @@ function renderBody(status: StatusResponse): HTMLElement {
     ]),
   );
 
+  const warning = renderProtectionWarning(status);
+  if (warning) body.appendChild(warning);
   body.appendChild(renderToggles(status));
   body.appendChild(renderActions(status));
   return body;
+}
+
+/**
+ * Loud, plain-language warning when protection is installed but INACTIVE.
+ *
+ * This panel exists because of a shipping fault. The feed pipeline refused the
+ * real threat lists, so no rule was ever installed; the extension still rendered
+ * a normal-looking popup with protection "On" and a rule count of 0. A user had
+ * no way to tell that nothing was being blocked.
+ *
+ * Silent failure is the worst possible behaviour for a security product, so an
+ * installed-but-empty rule set is called out above everything else.
+ */
+function renderProtectionWarning(status: StatusResponse): HTMLElement | null {
+  const { protection, settings } = status;
+
+  // Protection deliberately turned off is a choice, not a fault. Do not scold.
+  if (!settings.protectionEnabled) return null;
+
+  if (protection.dynamicRuleCount > 0) return null;
+
+  const failed = protection.rulesMeta?.lastError ?? null;
+
+  return el('section', { class: 'popup-alert', role: 'alert' }, [
+    el('strong', { text: t('popup_not_protected_title') }),
+    el('p', { text: t('popup_not_protected_body') }),
+    failed ? el('p', { class: 'small mono', text: failed }) : null,
+    button({
+      label: t('popup_not_protected_action'),
+      full: true,
+      onClick: async () => {
+        await request('feeds.refresh', {});
+        await scheduleRender();
+      },
+    }),
+  ]);
 }
 
 function statCell(label: string, value: string): HTMLElement {
@@ -219,9 +258,12 @@ function renderSiteCard(status: StatusResponse): HTMLElement {
   const host = analysis?.hostname ?? displayUrl(tab.url);
   const verdict = analysis?.verdict;
 
+  const favicon = el('span', { class: 'site-favicon', 'aria-hidden': 'true' });
+  applyFavicon(favicon, tab.url);
+
   const top = el('div', { class: 'site-card-top' }, [
     el('div', { class: 'site-host' }, [
-      el('span', { class: 'site-favicon', 'aria-hidden': 'true' }),
+      favicon,
       el('span', { class: 'site-hostname', title: host, text: truncateMiddle(host, 40) }),
     ]),
     badge(t(verdictKey(verdict)), verdictTone(verdict)),
