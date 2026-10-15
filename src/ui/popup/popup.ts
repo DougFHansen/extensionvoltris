@@ -4,7 +4,8 @@
  * Every action in the popup is wired to a real service-worker message. There are
  * no decorative buttons (Section 10).
  */
-import type { AnalysisResult, Settings } from '../../core/types';
+import type { AnalysisResult, Settings, UiLanguage } from '../../core/types';
+import { UI_LANGUAGES } from '../../core/types';
 import type { StatusResponse } from '../../background/messages';
 import { request } from '../../platform/messages';
 import {
@@ -24,6 +25,8 @@ import {
   truncateMiddle,
   type BadgeTone,
 } from '../shared/components';
+import { loadUiLanguage } from '../shared/i18n';
+
 const root = document.getElementById('app');
 
 function verdictTone(verdict: AnalysisResult['verdict'] | undefined): BadgeTone {
@@ -63,7 +66,27 @@ function reasonText(code: string): string {
 async function patchSettings(patch: Partial<Settings>): Promise<void> {
   const response = await request<Settings>('settings.patch', patch);
   if (!response.ok) return;
-  await render();
+  await scheduleRender();
+}
+
+/**
+ * Serialises rendering.
+ *
+ * `render()` awaits between clearing the root and writing the new content, so
+ * two overlapping renders interleave: one clears while the other is mid-write
+ * and both append. The result is duplicated DOM - in practice two `<select>`
+ * elements sharing the id `ui-language`, which also breaks every label that
+ * points at it.
+ *
+ * Clicking a dropdown fires a change event per selection, and the settings
+ * round-trip is asynchronous, so this race is reachable by an ordinary user
+ * clicking quickly. Chaining the renders makes the last one win, cleanly.
+ */
+let renderQueue: Promise<void> = Promise.resolve();
+
+function scheduleRender(): Promise<void> {
+  renderQueue = renderQueue.then(render, render);
+  return renderQueue;
 }
 
 async function render(): Promise<void> {
@@ -82,10 +105,49 @@ async function render(): Promise<void> {
   }
 
   const status = response.data;
+
+  // The language override must be applied before anything is rendered, since
+  // every label below resolves through it.
+  await loadUiLanguage(status.settings.uiLanguage);
+
   applyTheme(status.settings.theme, status.settings.reducedMotion);
   append(root, renderTopBar(status));
   append(root, renderBody(status));
   append(root, renderFooter(status));
+}
+
+/**
+ * Language picker in the header.
+ *
+ * `auto` is the default and means "follow the browser", which is what
+ * `chrome.i18n` already does. Choosing a language explicitly persists it, so the
+ * choice survives a browser restart and applies to every surface.
+ *
+ * A `<select>` is used rather than a custom menu: it is keyboard accessible and
+ * screen-reader correct with no extra code, and it works identically on every
+ * platform.
+ */
+function renderLanguagePicker(status: StatusResponse): HTMLElement {
+  const select = el('select', {
+    id: 'ui-language',
+    class: 'popup-lang',
+    title: t('lang_label'),
+    'aria-label': t('lang_label'),
+  }) as HTMLSelectElement;
+
+  for (const value of UI_LANGUAGES) {
+    // Each option is written in its own language, so someone who cannot read the
+    // current interface can still find their language.
+    const option = el('option', { value, text: t(`lang_${value}`) });
+    option.selected = value === status.settings.uiLanguage;
+    select.appendChild(option);
+  }
+
+  select.addEventListener('change', () => {
+    void patchSettings({ uiLanguage: select.value as UiLanguage });
+  });
+
+  return el('div', { class: 'popup-lang-wrap' }, [select]);
 }
 
 function renderTopBar(status: StatusResponse): HTMLElement {
@@ -103,11 +165,14 @@ function renderTopBar(status: StatusResponse): HTMLElement {
         el('span', { text: t('app_tagline') }),
       ]),
     ]),
-    el('label', { class: 'popup-master', for: 'master' }, [
-      master,
-      el('span', {
-        text: status.settings.protectionEnabled ? t('common_on') : t('common_off'),
-      }),
+    el('div', { class: 'popup-header-controls' }, [
+      renderLanguagePicker(status),
+      el('label', { class: 'popup-master', for: 'master' }, [
+        master,
+        el('span', {
+          text: status.settings.protectionEnabled ? t('common_on') : t('common_off'),
+        }),
+      ]),
     ]),
   ]);
 }
@@ -255,7 +320,7 @@ function renderActions(status: StatusResponse): HTMLElement {
         full: true,
         onClick: async () => {
           await request('allowlist.add', { domain, scope: 'threats', from: domain });
-          await render();
+          await scheduleRender();
         },
       }),
     );
@@ -265,7 +330,7 @@ function renderActions(status: StatusResponse): HTMLElement {
         full: true,
         onClick: async () => {
           if (status.currentTab) await request('page.rescan', { tabId: status.currentTab.id });
-          await render();
+          await scheduleRender();
         },
       }),
     );
@@ -287,9 +352,9 @@ function renderFooter(status: StatusResponse): HTMLElement {
   ]);
 }
 
-void render();
+void scheduleRender();
 
 // Keep the popup responsive to settings changes made in another surface.
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'local' && 'vbs.settings' in changes) void render();
+  if (areaName === 'local' && 'vbs.settings' in changes) void scheduleRender();
 });

@@ -555,6 +555,20 @@
   "hover_suspicious": {
     "message": "VOLTRIS: this link shows signs of impersonation or deception."
   },
+  "lang_auto": {
+    "message": "Browser language",
+    "description": "Language picker option that follows the browser, the default."
+  },
+  "lang_en": {
+    "message": "English"
+  },
+  "lang_label": {
+    "message": "Interface language",
+    "description": "Tooltip and accessible name of the language picker in the popup header."
+  },
+  "lang_pt_BR": {
+    "message": "Português (Brasil)"
+  },
   "lists_auto_update": {
     "message": "Automatic updates"
   },
@@ -1160,6 +1174,9 @@
   },
   "resources_title": {
     "message": "Active capabilities"
+  },
+  "settings_tab_language": {
+    "message": "Language and appearance"
   },
   "settings_title": {
     "message": "Settings"

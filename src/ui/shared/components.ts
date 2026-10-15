@@ -7,15 +7,16 @@
  * DOM XSS surface required by Section 14.
  */
 
-/** `chrome.i18n.getMessage` with a visible fallback for missing keys. */
-export function t(key: string, substitutions?: string | string[]): string {
-  try {
-    const message = chrome.i18n.getMessage(key, substitutions as never);
-    return message.length > 0 ? message : key;
-  } catch {
-    return key;
-  }
-}
+/**
+ * Message lookup.
+ *
+ * Re-exported from `./i18n` so every existing call site keeps importing `t`
+ * from this module while the language-override logic lives in one place. It is
+ * also imported for local use, because helpers in this file call it directly.
+ */
+import { translate as t } from './i18n';
+
+export { t };
 
 export type Attrs = Record<string, string | number | boolean | undefined | null>;
 export type Child = Node | string | number | null | undefined | false;

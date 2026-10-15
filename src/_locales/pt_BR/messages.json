@@ -555,6 +555,20 @@
   "hover_suspicious": {
     "message": "VOLTRIS: este link apresenta sinais de falsificação ou engano."
   },
+  "lang_auto": {
+    "message": "Idioma do navegador",
+    "description": "Opção do seletor que segue o navegador, o padrão."
+  },
+  "lang_en": {
+    "message": "English"
+  },
+  "lang_label": {
+    "message": "Idioma da interface",
+    "description": "Dica e nome acessível do seletor de idioma no cabeçalho do popup."
+  },
+  "lang_pt_BR": {
+    "message": "Português (Brasil)"
+  },
   "lists_auto_update": {
     "message": "Atualizações automáticas"
   },
@@ -1160,6 +1174,9 @@
   },
   "resources_title": {
     "message": "Recursos ativos"
+  },
+  "settings_tab_language": {
+    "message": "Idioma e aparência"
   },
   "settings_title": {
     "message": "Configurações"

@@ -9,6 +9,7 @@ import type { Settings } from '../../core/types';
 import type { DiagnosticsResponse } from '../../background/messages';
 import { FEED_REGISTRY } from '../../feeds/registry';
 import { request } from '../../platform/messages';
+import { loadUiLanguage } from '../shared/i18n';
 import {
   append,
   applyTheme,
@@ -59,9 +60,11 @@ const navSlot = document.getElementById('settings-nav');
 const panelSlot = document.getElementById('settings-panels');
 let activeTab: TabId = 'web';
 
-async function patch(patch: Partial<Settings>): Promise<void> {
-  await updateSettings(patch);
+async function patch(change: Partial<Settings>): Promise<void> {
+  await updateSettings(change);
   const settings = await getSettings();
+  // A language change must take effect on this page immediately, not on reload.
+  await loadUiLanguage(settings.uiLanguage);
   applyTheme(settings.theme, settings.reducedMotion);
   await renderActiveTab();
 }
@@ -864,6 +867,7 @@ async function renderActiveTab(): Promise<void> {
 
 async function init(): Promise<void> {
   const settings = await getSettings();
+  await loadUiLanguage(settings.uiLanguage);
   applyTheme(settings.theme, settings.reducedMotion);
 
   const heading = document.getElementById('settings-heading');

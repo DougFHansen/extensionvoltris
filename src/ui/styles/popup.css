@@ -47,6 +47,54 @@ body.popup {
   color: #ffffff;
 }
 
+/*
+ * Header controls: the language picker sits next to the master switch.
+ *
+ * The picker is a native `<select>` rather than a custom menu: it is keyboard
+ * accessible and correctly announced by screen readers with no extra code, and
+ * it behaves identically on Windows, macOS and Linux. Styling is limited to
+ * colour and shape so the native control keeps its own interaction behaviour.
+ */
+.popup-header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--vbs-sp-2);
+  flex-shrink: 0;
+}
+
+.popup-lang-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.popup-lang {
+  max-width: 8.5rem;
+  padding: 3px var(--vbs-sp-2);
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: var(--vbs-r-sm);
+  background: rgb(255 255 255 / 12%);
+  color: #ffffff;
+  font-size: var(--vbs-fs-xs);
+  font-family: inherit;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.popup-lang:hover {
+  background: rgb(255 255 255 / 20%);
+}
+
+.popup-lang:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* The dropdown list itself is drawn by the OS, so it needs explicit colours. */
+.popup-lang option {
+  background: var(--vbs-surface, #1b1f2a);
+  color: var(--vbs-text, #ffffff);
+}
+
 .popup-title {
   display: flex;
   flex-direction: column;

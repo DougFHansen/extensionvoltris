@@ -401,6 +401,129 @@ test.describe('interstitial', () => {
   });
 });
 
+test.describe('language', () => {
+  // The suite runs with --lang=en-US, so the browser default is English. The
+  // pt-BR browser behaviour is verified by a dedicated test at the bottom.
+
+  test.afterEach(async () => {
+    await sendMessage(handle, { v: 1, t: 'settings.patch', p: { uiLanguage: 'auto' } });
+  });
+
+  test('the interface follows the browser language by default', async () => {
+    const page = await handle.context.newPage();
+    await page.goto(url(handle, 'popup.html'));
+    await expect(page.locator('.popup-title span')).toContainText(/Protection that explains itself/);
+    await page.close();
+  });
+
+  test('the language picker offers each language in its own words', async () => {
+    const page = await handle.context.newPage();
+    await page.goto(url(handle, 'popup.html'));
+    const options = await page.locator('#ui-language option').allInnerTexts();
+    // Written in their own language, so someone who cannot read the current
+    // interface can still find theirs.
+    expect(options).toEqual(['Browser language', 'English', 'Português (Brasil)']);
+    await page.close();
+  });
+
+  test('the user can override the language and every surface follows', async () => {
+    await setSettings(handle, { uiLanguage: 'pt_BR' });
+
+    const popup = await handle.context.newPage();
+    await popup.goto(url(handle, 'popup.html'));
+    await expect(popup.locator('.popup-title span')).toContainText(/Prote/);
+    await expect(popup.locator('.popup-stats')).toContainText('Bloqueios hoje');
+
+    // The dashboard must follow too, including its own tab bar - which is
+    // written during init, before the panel content. Getting that wrong left a
+    // half-translated page and was a real bug.
+    const dash = await handle.context.newPage();
+    await dash.goto(url(handle, 'dashboard.html'));
+    await expect(dash.locator('.page-nav button').first()).toContainText('Resumo');
+
+    const settings = await handle.context.newPage();
+    await settings.goto(url(handle, 'options.html'));
+    await expect(settings.locator('#settings-nav button').first()).toContainText(/Prote/);
+
+    await popup.close();
+    await dash.close();
+    await settings.close();
+  });
+
+  test('choosing "browser language" restores the browser default', async () => {
+    await setSettings(handle, { uiLanguage: 'pt_BR' });
+    const page = await handle.context.newPage();
+    await page.goto(url(handle, 'popup.html'));
+    await expect(page.locator('.popup-title span')).toContainText(/Prote/);
+
+    await page.locator('#ui-language').selectOption('auto');
+    await expect(page.locator('.popup-title span')).toContainText(/Protection that explains itself/);
+    await page.close();
+  });
+
+  test('rapid language changes never duplicate the picker', async () => {
+    // Regression: renders were not serialised, so a burst of change events let
+    // two renders interleave between clearing the root and writing, leaving two
+    // <select> elements sharing the same id.
+    const page = await handle.context.newPage();
+    await page.goto(url(handle, 'popup.html'));
+    for (const value of ['en', 'pt_BR', 'auto', 'pt_BR', 'en']) {
+      await page.locator('#ui-language').selectOption(value);
+      await page.waitForTimeout(50);
+    }
+    await expect(page.locator('#ui-language')).toHaveCount(1);
+    await expect(page.locator('.popup-top')).toHaveCount(1);
+    await page.close();
+  });
+
+  test('a pt-BR browser gets Portuguese with no configuration at all', async () => {
+    // Separate browser instance with a different UI language, its own profile,
+    // and no override set, so only `chrome.i18n` can explain the result.
+    const pt = await launchWithExtension({ lang: 'pt-BR' });
+    try {
+      const page = await pt.context.newPage();
+      await page.goto(pt.url('popup.html'));
+      await expect(page.locator('.popup-title span')).toContainText(/Prote/);
+      await page.close();
+    } finally {
+      await pt.context.close();
+    }
+  });
+});
+
+test.describe('settings access', () => {
+  test('the settings button actually opens the settings page', async () => {
+    // Regression: the manifest declared no `options_ui`, and
+    // `chrome.runtime.openOptionsPage()` does nothing at all without one. The
+    // button looked correct and silently did nothing.
+    const manifest = await handle.withWorker((w) => w.evaluate(() => chrome.runtime.getManifest()));
+    expect(manifest.options_ui, 'manifest must declare options_ui').toBeTruthy();
+
+    const page = await handle.context.newPage();
+    await page.goto(url(handle, 'popup.html'));
+    const [opened] = await Promise.all([
+      handle.context.waitForEvent('page', { timeout: 15_000 }),
+      page.locator('.popup-actions button', { hasText: /Settings|Configura/i }).last().click(),
+    ]);
+    await expect(opened).toHaveURL(/options\.html/);
+    await expect(opened.locator('#settings-nav')).toBeVisible();
+    await page.close();
+    await opened.close();
+  });
+
+  test('the settings page is reachable from the dashboard too', async () => {
+    const page = await handle.context.newPage();
+    await page.goto(url(handle, 'dashboard.html'));
+    const [opened] = await Promise.all([
+      handle.context.waitForEvent('page', { timeout: 15_000 }),
+      page.locator('#open-options').click(),
+    ]);
+    await expect(opened).toHaveURL(/options\.html/);
+    await page.close();
+    await opened.close();
+  });
+});
+
 test.describe('responsiveness', () => {
   test('surfaces render at a narrow viewport without horizontal overflow', async () => {
     const page = await handle.context.newPage();
@@ -419,6 +542,5 @@ test.describe('responsiveness', () => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto(url(handle, 'dashboard.html'));
     await expect.poll(async () => page.evaluate(() => document.documentElement.dataset.theme)).toBe('dark');
-    await page.close();
-  });
+    await page.close();  });
 });

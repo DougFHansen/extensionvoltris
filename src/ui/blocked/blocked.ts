@@ -11,6 +11,7 @@
  */
 import type { AnalysisResult } from '../../core/types';
 import { request } from '../../platform/messages';
+import { loadUiLanguage } from '../shared/i18n';
 import type { BlockDetails } from '../../background/messages';
 import {
   append,
@@ -80,7 +81,10 @@ async function render(): Promise<void> {
   append(root, el('div', { class: 'popup-loading' }, [spinner(t('common_loading'))]));
 
   const settings = await getSettings().catch(() => null);
-  if (settings) applyTheme(settings.theme, settings.reducedMotion);
+  if (settings) {
+    await loadUiLanguage(settings.uiLanguage);
+    applyTheme(settings.theme, settings.reducedMotion);
+  }
 
   const token = readToken();
   if (token === null) {

@@ -32,6 +32,7 @@ const BOOLEAN_KEYS = [
 const ENUM_KEYS = {
   downloadAction: ['alert', 'cancel'],
   theme: ['system', 'light', 'dark'],
+  uiLanguage: ['auto', 'en', 'pt_BR'],
 } as const satisfies Record<string, readonly string[]>;
 
 let cached: Settings | null = null;

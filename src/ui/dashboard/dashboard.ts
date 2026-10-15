@@ -8,6 +8,7 @@ import type { HistoryEvent } from '../../core/types';
 import { METRIC_CAPABILITIES } from '../../core/types';
 import type { DashboardResponse } from '../../background/messages';
 import { request } from '../../platform/messages';
+import { loadUiLanguage } from '../shared/i18n';
 import { getSettings, updateSettings } from '../../data/settings';
 import {
   append,
@@ -79,6 +80,8 @@ function eventLabel(kind: HistoryEvent['kind']): string {
 
 async function refresh(): Promise<void> {
   const settings = await getSettings();
+  // The override must be in place before any label is rendered.
+  await loadUiLanguage(settings.uiLanguage);
   applyTheme(settings.theme, settings.reducedMotion);
 
   const response = await request<DashboardResponse>('get.dashboard', {});
@@ -579,6 +582,12 @@ function renderPrivacy(): Child[] {
 
 async function init(): Promise<void> {
   const settings = await getSettings();
+
+  // MUST come before the first `t()` call below. The heading, subtitle and the
+  // whole tab bar are written here, ahead of `refresh()`, so loading the
+  // override later would leave them in the browser's language while the panel
+  // content underneath used the chosen one.
+  await loadUiLanguage(settings.uiLanguage);
   applyTheme(settings.theme, settings.reducedMotion);
 
   const heading = document.getElementById('dash-heading');

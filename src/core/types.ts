@@ -380,7 +380,21 @@ export interface Settings {
   readonly theme: 'system' | 'light' | 'dark';
   /** Reduz animacoes para usuarios sensiveis. */
   readonly reducedMotion: boolean;
+  /**
+   * Interface language.
+   *
+   * `'auto'` follows the browser, which is what `chrome.i18n` already does and
+   * therefore the default. An explicit value overrides it, for a user whose
+   * browser is in one language but who wants the extension in another.
+   */
+  readonly uiLanguage: UiLanguage;
 }
+
+/** Selectable interface languages. `auto` means "whatever the browser says". */
+export type UiLanguage = 'auto' | 'en' | 'pt_BR';
+
+/** Languages offered in the picker, with the name written in that language. */
+export const UI_LANGUAGES: readonly UiLanguage[] = ['auto', 'en', 'pt_BR'];
 
 export const DEFAULT_SETTINGS: Settings = {
   version: 1,
@@ -413,6 +427,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
   theme: 'system',
   reducedMotion: false,
+  uiLanguage: 'auto',
 };
 
 /** Deteccao de sinais de golpe na pagina (content script). */
