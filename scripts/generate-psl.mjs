@@ -17,7 +17,7 @@
  *   key "!"                 -> exception rule: prevailing suffix is one label shorter
  */
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync, existsSync, copyFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync, existsSync, copyFileSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -115,6 +115,20 @@ async function main() {
   const sha256 = createHash('sha256').update(text, 'utf8').digest('hex');
   const parsed = parseRules(text);
   const trie = buildTrie(parsed);
+
+  // DETERMINISTIC OUTPUT.
+  //
+  // `generatedAt` used to be `new Date().toISOString()`, which meant every build
+  // rewrote the committed psl.json even when the Public Suffix List had not
+  // changed at all - producing a spurious diff on a 187 KB generated file and
+  // changing the published package's SHA-256 for no reason.
+  //
+  // The date is now taken from the source list's own modification date, so the
+  // same input always produces byte-identical output. When a build reuses the
+  // already-vendored copy (the normal case) that date is the vendoring date,
+  // which is the honest answer to "when did we take this snapshot".
+  const generatedAt = new Date(statSync(VENDORED).mtimeMs).toISOString();
+
   const payload = {
     schemaVersion: 1,
     source: PSL_URL,
@@ -122,15 +136,20 @@ async function main() {
     licenseUrl: 'https://mozilla.org/MPL/2.0/',
     origin,
     sha256,
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     ruleCount: parsed.normal.length + parsed.wildcard.length + parsed.exceptions.length,
     icannRules: parsed.normal.length,
     privateRules: parsed.wildcard.length + parsed.exceptions.length,
     root: trie,
   };
   mkdirSync(dirname(OUT), { recursive: true });
-  writeFileSync(OUT, `${JSON.stringify(payload)}\n`, 'utf8');
-  const size = Buffer.byteLength(JSON.stringify(payload));
+
+  const next = `${JSON.stringify(payload)}\n`;
+  // Only write when the content actually differs, so mtime stays stable and git
+  // does not see a change on every build.
+  if (!existsSync(OUT) || readFileSync(OUT, 'utf8') !== next) writeFileSync(OUT, next, 'utf8');
+
+  const size = Buffer.byteLength(next);
   process.stdout.write(
     `[psl] ${payload.ruleCount} rules (${origin}) -> src/generated/psl.json (${(size / 1024).toFixed(1)} KiB, sha256 ${sha256.slice(0, 12)})\n`,
   );

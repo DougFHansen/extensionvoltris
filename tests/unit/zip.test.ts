@@ -105,36 +105,77 @@ describe('archive layout', () => {
   });
 });
 
-describe('published artifacts', () => {
-  const artifacts = ['chrome', 'edge']
-    .map((t) => `artifacts/voltris-browser-shield-${readVersion()}-${t}.zip`)
-    .filter((p) => existsSync(p));
+/**
+ * Checks over the real store archives.
+ *
+ * These SKIP when the archives have not been built yet. `npm test` legitimately
+ * runs before `npm run package` in the verify chain, so failing here would make
+ * the suite depend on pipeline ordering rather than on correctness - and it did
+ * exactly that on the first CI run. A test that fails only because it ran too
+ * early is a bad test.
+ *
+ * The authoritative artifact check is `npm run verify:package`, which extracts
+ * the archive with an independent reader and loads it into a real browser. That
+ * one fails loudly, and runs after packaging.
+ */
+const ARTIFACTS = ['chrome', 'edge']
+  .map((t) => `artifacts/voltris-browser-shield-${readVersion()}-${t}.zip`)
+  .filter((p) => existsSync(p));
 
-  it('has artifacts to check (run npm run package)', () => {
-    expect(artifacts.length).toBeGreaterThan(0);
+const artifactsBuilt = ARTIFACTS.length > 0;
+
+describe.skipIf(!artifactsBuilt)('published artifacts', () => {
+  it('archives exist to check (skipping when not yet packaged)', () => {
+    expect(ARTIFACTS).toHaveLength(2);
   });
 
-  it.each(artifacts)('%s has no backslash separators and manifest.json at the root', (path) => {
+  it.each(ARTIFACTS)('%s has no backslash separators and manifest.json at the root', (path) => {
     const names = listZipEntries(readFileSync(path));
     expect(names.filter((n) => n.includes('\\'))).toEqual([]);
     expect(names).toContain('manifest.json');
-    expect(names.every((n) => !n.startsWith('/') && !n.includes('..'))).toBe(true);
+    expect(names.every((n) => !n.startsWith('/') && !n.split('/').includes('..'))).toBe(true);
   });
 
-  it.each(artifacts)('%s contains every file from its dist directory', (path) => {
-    const target = path.includes('edge') ? 'edge' : 'chrome';
+  it.each(ARTIFACTS)('%s contains every file the browser resolves by path', (path) => {
     const names = new Set(listZipEntries(readFileSync(path)));
-    // Spot-check the files the browser resolves by exact path.
+    // These are the exact strings the manifest and the HTML pages ask for.
     for (const required of ['background.js', 'popup.html', 'dashboard.html', 'options.html', 'blocked.html', 'content.js']) {
-      expect(names.has(required), `${required} missing from ${target} archive`).toBe(true);
+      expect(names.has(required), `${required} missing from ${path}`).toBe(true);
     }
   });
 
-  it.each(artifacts)('%s is well under the store size limit', (path) => {
+  it.each(ARTIFACTS)('%s round-trips through an independent reader', (path) => {
+    // Inflate every entry and confirm the CRC recorded in the archive.
+    const archive = readFileSync(path);
+    const entries = readZip(archive);
+    expect(entries.size).toBeGreaterThan(0);
+    for (const [name, data] of entries) {
+      expect(crc32(data), `${name} in ${path} fails its own CRC`).toBe(
+        crcFromArchive(archive, name),
+      );
+    }
+  });
+
+  it.each(ARTIFACTS)('%s is well under the store size limit', (path) => {
     // Chrome Web Store limit is 2 GB; anything near it suggests stray files.
     expect(statSync(path).size).toBeLessThan(50 * 1024 * 1024);
   });
 });
+
+/** Reads the CRC a given entry declares in its local file header. */
+function crcFromArchive(archive: Buffer, target: string): number {
+  let offset = 0;
+  while (offset < archive.length - 4 && archive.readUInt32LE(offset) === 0x04034b50) {
+    const crc = archive.readUInt32LE(offset + 14);
+    const compressedSize = archive.readUInt32LE(offset + 18);
+    const nameLen = archive.readUInt16LE(offset + 26);
+    const extraLen = archive.readUInt16LE(offset + 28);
+    const name = archive.subarray(offset + 30, offset + 30 + nameLen).toString('utf8');
+    if (name === target) return crc;
+    offset += 30 + nameLen + extraLen + compressedSize;
+  }
+  throw new Error(`entry not found in archive: ${target}`);
+}
 
 function readVersion(): string {
   const manifest = JSON.parse(readFileSync('src/manifest.json', 'utf8')) as { version: string };

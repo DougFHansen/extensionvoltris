@@ -56,7 +56,22 @@ function extractIndependently(archive, destination) {
   return 'unzip';
 }
 
+/** Fails early with an actionable message rather than a bare ENOENT. */
+function requireUnzip() {
+  if (process.platform === 'win32') return;
+  try {
+    execFileSync('unzip', ['-v'], { stdio: 'ignore' });
+  } catch {
+    process.stderr.write(
+      '[zip-verify] the `unzip` binary is required on Linux so the archive is read by an\n' +
+        '            implementation we did not write. Install it, e.g. `sudo apt-get install -y unzip`.\n',
+    );
+    process.exit(1);
+  }
+}
+
 try {
+  requireUnzip();
   const reader = extractIndependently(zip, unpacked);
   console.log(`[zip-verify] archive extracted with ${reader} (independent reader)`);
 

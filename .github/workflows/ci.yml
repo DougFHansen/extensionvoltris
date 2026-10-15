@@ -63,7 +63,13 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+
+      # `verify:package` needs the archive, so packaging must happen BEFORE it.
+      # The first CI run failed here because only `npm run build` ran.
+      - name: Build and package
+        run: |
+          npm run build
+          npm run package
 
       - name: Install Playwright Chromium
         run: npx playwright install --with-deps chromium
@@ -73,5 +79,5 @@ jobs:
 
       - name: Load the packaged archive
         # Proves the artifact that would be uploaded to the stores actually runs,
-        # using .NET-equivalent extraction on a real unzip path.
+        # extracted by a reader we did not write.
         run: node scripts/verify-package.mjs
